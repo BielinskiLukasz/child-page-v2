@@ -61,6 +61,7 @@ interface CloudEntity {
   x: number;
   speed: number;
   tapped: boolean;
+  scale: number;
 }
 
 interface BirdEntity {
@@ -129,6 +130,8 @@ export default function DzienINocActivity() {
 
     const renderProgress = () => {
       scene.style.setProperty('--p', progress.toFixed(3));
+      // A warm pink-orange dusk peaks in the middle of the transition
+      scene.style.setProperty('--dusk', (Math.sin(Math.min(1, Math.max(0, progress)) * Math.PI) * 0.45).toFixed(3));
       const isNight = progress >= 0.5;
       bodyBtn.setAttribute('aria-label', isNight ? 'Księżyc' : 'Słońce');
     };
@@ -163,7 +166,7 @@ export default function DzienINocActivity() {
 
     // ── Clouds ──────────────────────────────────────────────────
     const placeCloud = (c: CloudEntity) => {
-      c.node.style.transform = `translateX(${c.x.toFixed(2)}vw)`;
+      c.node.style.transform = `translateX(${c.x.toFixed(2)}vw) scale(${c.scale.toFixed(3)})`;
     };
 
     const removeCloud = (c: CloudEntity) => {
@@ -180,9 +183,15 @@ export default function DzienINocActivity() {
       node.className = 'dn-cloud';
       node.innerHTML = CLOUD_SVG;
       node.style.top = `${y}%`;
-      node.style.setProperty('--w', `${(18 + Math.random() * 12).toFixed(2)}vmin`);
+      // Parallax: wider clouds are "nearer" - they scale up, move faster and sit brighter
+      const width = 18 + Math.random() * 12;
+      const w01 = (width - 18) / 12;
+      const scale = 0.78 + w01 * 0.42;
+      const depthSpeed = 0.7 + w01 * 0.6;
+      node.style.setProperty('--w', `${width.toFixed(2)}vmin`);
+      node.style.filter = `brightness(${(0.82 + w01 * 0.24).toFixed(2)})`;
       cloudBox.appendChild(node);
-      const entity: CloudEntity = { node, x, speed, tapped };
+      const entity: CloudEntity = { node, x, speed: speed * depthSpeed, tapped, scale };
       clouds.push(entity);
       placeCloud(entity);
       return entity;

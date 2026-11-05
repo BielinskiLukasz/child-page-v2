@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ACTIVITIES } from '../data/activities';
-import { MascotIcon, SparkleIcon } from './ArtIcons';
+import ActivityIcon from './ActivityIcon';
 import {
   Analytics,
   type AnalyticsPeriod,
@@ -269,11 +269,6 @@ export default function ParentSettingsModal({ menuEntries, onChangeMenu, onClose
       >
         {pane === 'gate' && (
           <div className="mx-auto max-w-sm text-center">
-            <div className="relative mx-auto mb-3 grid h-20 w-20 place-items-center rounded-[1.6rem] bg-gradient-to-br from-violet-200 via-fuchsia-100 to-amber-100 shadow-md shadow-violet-200/60 ring-4 ring-white">
-              <MascotIcon className="h-14 w-14" />
-              <SparkleIcon className="absolute -top-1 -right-2 h-6 w-6 text-amber-400" />
-              <SparkleIcon className="absolute -bottom-1 -left-2 h-4 w-4 text-fuchsia-300" />
-            </div>
             <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-[11px] font-extrabold tracking-wide text-violet-700 uppercase">
               🔒 Tylko dla rodzica
             </span>
@@ -478,9 +473,7 @@ export default function ParentSettingsModal({ menuEntries, onChangeMenu, onClose
                           onChange={() => toggleEnabled(entry.id)}
                           className="h-5 w-5 shrink-0 accent-violet-600"
                         />
-                        <span className="text-lg" aria-hidden="true">
-                          {act.emoji}
-                        </span>
+                        <ActivityIcon id={act.id} fallback={act.emoji} className="h-8 w-8" />
                         <span
                           className={`truncate text-sm font-bold ${
                             entry.on ? 'text-[#463d59]' : 'text-[#b2a8c4] line-through'
@@ -717,44 +710,6 @@ export default function ParentSettingsModal({ menuEntries, onChangeMenu, onClose
                 </span>
               </div>
             </div>
-
-            {/* Pastel bar chart */}
-            <section className="rounded-2xl border border-[#ece3f4] bg-white/85 p-4">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-display text-base font-semibold text-[#453a5c]">
-                  📊 Najczęściej wybierane
-                </h3>
-                <span className="text-[10px] font-bold text-[#a195b8] uppercase tracking-wide">czas aktywny</span>
-              </div>
-              {statsData.rank.rows.length === 0 ? (
-                <div className="mt-3 flex h-24 items-center justify-center rounded-xl border border-dashed border-[#e8dff2] bg-[#fbf8f2] text-xs font-semibold text-[#a195b8]">
-                  Jeszcze brak danych do wykresu 🌱
-                </div>
-              ) : (
-                <div className="mt-3 space-y-2.5">
-                  {statsData.rank.rows.slice(0, 5).map((row, idx) => {
-                    const max = Math.max(1, statsData.rank.rows[0].act);
-                    const pct = Math.max(4, Math.round((row.act / max) * 100));
-                    const act = activityById.get(row.id);
-                    const shades = ['#c9b8f2', '#f7b6d2', '#ffd98a', '#a9dcb4', '#a8d8f0'];
-                    return (
-                      <div key={row.id} className="flex items-center gap-2.5">
-                        <span className="w-5 shrink-0 text-center text-xs font-extrabold text-[#a195b8]">{idx + 1}</span>
-                        <span className="w-6 shrink-0 text-center text-base" aria-hidden="true">{act?.emoji ?? '🎈'}</span>
-                        <span className="w-28 shrink-0 truncate text-[11px] font-bold text-[#5b4f70] sm:w-40">{row.name}</span>
-                        <span className="relative h-4 flex-1 overflow-hidden rounded-full bg-[#f2ecf9]">
-                          <span
-                            className="chart-bar absolute inset-y-0 left-0 rounded-full"
-                            style={{ width: pct + '%', backgroundColor: shades[idx], animationDelay: idx * 0.08 + 's' }}
-                          />
-                        </span>
-                        <span className="w-16 shrink-0 text-right text-[10px] font-extrabold text-[#8a7fa3]">{formatDuration(row.act)}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
 
             <section className="rounded-2xl border border-[#ece3f4] bg-white/85 p-4">
               <h3 className="font-display text-base font-semibold text-[#453a5c]">

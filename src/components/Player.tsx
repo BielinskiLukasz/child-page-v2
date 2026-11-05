@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { getNativeActivity } from '../activities';
-import { Analytics } from '../utils/analytics';
+import { Analytics, onAnalyticsEvent } from '../utils/analytics';
 import {
   getPlaytimeProgress,
   getStageOpacity,
@@ -12,7 +12,7 @@ import {
 interface Props {
   activityId: string;
   title: string;
-  emoji?: string;
+  origin?: { x: number; y: number } | null;
   onClose: () => void;
 }
 
@@ -76,27 +76,71 @@ function SleepingMoonScreen() {
   );
 }
 
-export default function Player({ activityId, title, emoji = '🧸', onClose }: Props) {
+export default function Player({ activityId, title, origin, onClose }: Props) {
   const NativeActivity = getNativeActivity(activityId);
   const backRef = useRef<HTMLButtonElement>(null);
+  const stageWrapRef = useRef<HTMLDivElement>(null);
+  const closingRef = useRef(false);
+  const [closing, setClosing] = useState(false);
+  const [hint, setHint] = useState(false);
+  const sparkleHostRef = useRef<HTMLDivElement>(null);
+  const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
+
+  // A gentle pulsing hint appears after a short idle so a toddler knows the screen is touchable.
+  useEffect(() => {
+    const timer = window.setTimeout(() => setHint(true), 3200);
+    const hide = () => setHint(false);
+    document.addEventListener('pointerdown', hide, { capture: true, once: true });
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('pointerdown', hide, { capture: true });
+    };
+  }, []);
+
+  const spawnSparkles = useCallback(() => {
+    const host = sparkleHostRef.current;
+    if (!host || host.childElementCount > 40) return;
+    const origin =
+      lastTouchRef.current ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const rect = host.getBoundingClientRect();
+    const ox = origin.x - rect.left;
+    const oy = origin.y - rect.top;
+    for (let i = 0; i < 14; i++) {
+      const el = document.createElement('span');
+      el.className = 'win-spark';
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 55 + Math.random() * 95;
+      el.style.setProperty('--dx', `${(Math.cos(ang) * dist).toFixed(1)}px`);
+      el.style.setProperty('--dy', `${(Math.sin(ang) * dist - 42).toFixed(1)}px`);
+      el.style.setProperty('--s', `${(7 + Math.random() * 8).toFixed(1)}px`);
+      el.style.setProperty('--d', `${(0.7 + Math.random() * 0.45).toFixed(2)}s`);
+      el.style.left = `${ox.toFixed(1)}px`;
+      el.style.top = `${oy.toFixed(1)}px`;
+      host.appendChild(el);
+      window.setTimeout(() => el.remove(), 1250);
+    }
+  }, []);
+
+  // Every game reports completion through Analytics; answer with a soft sparkle burst.
+  useEffect(
+    () =>
+      onAnalyticsEvent((type) => {
+        if (type === 'activity_complete' || type === 'level_complete') {
+          spawnSparkles();
+        }
+      }),
+    [spawnSparkles],
+  );
+
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+    window.setTimeout(onClose, 500);
+  }, [onClose]);
 
   const [playState, setPlayState] = useState(() => loadPlaytime());
   const [expired, setExpired] = useState(() => isPlaytimeExpired());
-  const [titleVisible, setTitleVisible] = useState(true);
-  const [sceneKey, setSceneKey] = useState(0);
-
-  const restartScene = () => {
-    Analytics.track('activity_restart');
-    setSceneKey((key) => key + 1);
-    setTitleVisible(true);
-    window.setTimeout(() => setTitleVisible(false), 2600);
-  };
-
-  useEffect(() => {
-    setTitleVisible(true);
-    const timer = window.setTimeout(() => setTitleVisible(false), 3200);
-    return () => window.clearTimeout(timer);
-  }, [activityId]);
 
   useEffect(() => {
     const initial = loadPlaytime();
@@ -140,7 +184,7 @@ export default function Player({ activityId, title, emoji = '🧸', onClose }: P
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !document.fullscreenElement) {
-        onClose();
+        requestClose();
       }
     };
     document.addEventListener('keydown', onKey);
@@ -151,7 +195,7 @@ export default function Player({ activityId, title, emoji = '🧸', onClose }: P
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = previous;
     };
-  }, [onClose]);
+  }, [requestClose]);
 
   const unlimited = playState.limit === null;
   const progress = expired ? 1 : getPlaytimeProgress(playState);
@@ -159,20 +203,19 @@ export default function Player({ activityId, title, emoji = '🧸', onClose }: P
 
   return (
     <section
-      className="scene-frame fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
+      className={`player-${closing ? 'close' : 'reveal'} fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]${closing ? ' pointer-events-none' : ''}`}
+      style={
+        {
+          '--ox': origin ? `${origin.x}px` : '50%',
+          '--oy': origin ? `${origin.y}px` : '50%',
+        } as CSSProperties
+      }
       aria-label={title}
     >
-      {!expired && (
-        <div className={`scene-title-pill${titleVisible ? '' : ' fade-away'}`} aria-hidden="true">
-          <span className="scene-emoji">{emoji}</span>
-          <span className="truncate">{title}</span>
-        </div>
-      )}
-
       <button
         ref={backRef}
         type="button"
-        onClick={onClose}
+        onClick={requestClose}
         className="player-back back transition-transform active:scale-95"
         aria-label="Powrót do menu"
       >
@@ -192,50 +235,68 @@ export default function Player({ activityId, title, emoji = '🧸', onClose }: P
         <HourglassIndicator progress={progress} offsetLeft={activityId === 'naklejki'} />
       )}
 
-      {!expired && (
-        <button
-          type="button"
-          onClick={restartScene}
-          className="scene-restart"
-          style={{
-            right: `calc(var(--safe-r) + ${
-              activityId === 'naklejki' ? (!unlimited ? 138 : 10) : !unlimited ? 74 : 10
-            }px)`,
-          }}
-          aria-label="Nowa scena – wylosuj od nowa"
-          title="Nowa scena"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path
-              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      )}
-
       {expired ? (
         <SleepingMoonScreen />
       ) : (
         <div
-          className="animate-scene-in h-full w-full origin-center"
+          ref={stageWrapRef}
+          className="relative h-full w-full"
           style={{ opacity: stageOpacity }}
-          onPointerDownCapture={() => Analytics.recordStageTouch()}
+          onPointerDownCapture={(event) => {
+            Analytics.recordStageTouch();
+            lastTouchRef.current = { x: event.clientX, y: event.clientY };
+            if ('vibrate' in navigator) {
+              try {
+                navigator.vibrate(8);
+              } catch {
+                /* haptics unsupported */
+              }
+            }
+            const host = stageWrapRef.current;
+            if (!host) return;
+            if (host.querySelectorAll('.stage-ripple').length > 10) return;
+            const rect = host.getBoundingClientRect();
+            const el = document.createElement('span');
+            el.className = 'stage-ripple';
+            el.style.left = `${event.clientX - rect.left}px`;
+            el.style.top = `${event.clientY - rect.top}px`;
+            host.appendChild(el);
+            window.setTimeout(() => el.remove(), 620);
+          }}
           onKeyDownCapture={() => Analytics.recordStageTouch()}
         >
-          {NativeActivity ? <NativeActivity key={`${activityId}-${sceneKey}`} /> : null}
+          {NativeActivity ? <NativeActivity key={activityId} /> : null}
+
+          <div ref={sparkleHostRef} className="pointer-events-none absolute inset-0 z-[46]" aria-hidden="true" />
+
+          {hint && (
+            <span
+              className="pointer-events-none absolute inset-0 z-[45] grid place-items-center"
+              aria-hidden="true"
+            >
+              <span className="act-hint-badge">
+                <svg viewBox="0 0 48 48" className="h-12 w-12">
+                  <circle cx="24" cy="24" r="7.5" fill="#8f7fd1" />
+                  <path
+                    d="M24 7a17 17 0 0 1 17 17"
+                    stroke="#8f7fd1"
+                    strokeWidth="4.5"
+                    strokeLinecap="round"
+                    fill="none"
+                    opacity="0.55"
+                  />
+                  <path
+                    d="M24 41A17 17 0 0 1 7 24"
+                    stroke="#8f7fd1"
+                    strokeWidth="4.5"
+                    strokeLinecap="round"
+                    fill="none"
+                    opacity="0.55"
+                  />
+                </svg>
+              </span>
+            </span>
+          )}
         </div>
       )}
     </section>

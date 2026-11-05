@@ -1,25 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NATIVE_COUNT } from './activities';
-import { AllIcon, CATEGORY_ICONS, MascotIcon, StarIcon } from './components/ArtIcons';
-import MoodSwitcher from './components/MoodSwitcher';
 import ActivityCard from './components/ActivityCard';
+import ActivityIcon from './components/ActivityIcon';
+import ChildMode from './components/ChildMode';
 import ParentDialog from './components/ParentDialog';
 import ParentSettingsModal from './components/ParentSettingsModal';
 import Player from './components/Player';
-import { ARTWORK, CATEGORY_ARTWORK, FEATURED_ARTWORK } from './data/artwork';
 import {
   ACTIVITIES,
   CATEGORIES,
   type Activity,
   type CategoryId,
 } from './data/activities';
-import {
-  applyMood,
-  loadMood,
-  saveMood,
-  MOOD_LABELS,
-  type Mood,
-} from './utils/theme';
 import {
   loadMenuConfig,
   saveMenuConfig,
@@ -37,21 +29,19 @@ function plural(count: number, one: string, few: string, many: string) {
 export default function App() {
   const [menuEntries, setMenuEntries] = useState<MenuEntry[]>(loadMenuConfig);
   const [activeActivityId, setActiveActivityId] = useState<string | null>(null);
+  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<CategoryId>('wszystkie');
   const [favouritesOnly, setFavouritesOnly] = useState(false);
   const [parentsOpen, setParentsOpen] = useState(false);
+  const [childMode, setChildMode] = useState(() => {
+    try {
+      return window.localStorage.getItem('swa.childMode') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [mood, setMood] = useState<Mood>(loadMood);
-
-  useEffect(() => {
-    applyMood(mood);
-  }, [mood]);
-
-  const handleMoodChange = useCallback((next: Mood) => {
-    setMood(next);
-    saveMood(next);
-  }, []);
   const searchRef = useRef<HTMLInputElement>(null);
   const pushedHashRef = useRef(false);
 
@@ -104,7 +94,8 @@ export default function App() {
     return () => window.removeEventListener('hashchange', syncFromHash);
   }, [activityById, menuEntries]);
 
-  const openActivity = useCallback((activity: Activity) => {
+  const openActivity = useCallback((activity: Activity, from?: { x: number; y: number }) => {
+    setOrigin(from ?? null);
     setActiveActivityId(activity.id);
     if (window.location.hash !== `#${activity.id}`) {
       pushedHashRef.current = true;
@@ -127,6 +118,24 @@ export default function App() {
       }
     }
   }, []);
+
+  const changeChildMode = useCallback((on: boolean) => {
+    setChildMode(on);
+    try {
+      window.localStorage.setItem('swa.childMode', on ? '1' : '0');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Child mode shows favourites first, then the rest in the parent-configured order.
+  const childActivities = useMemo(
+    () => [
+      ...enabledActivities.filter((a) => favouriteSet.has(a.id)),
+      ...enabledActivities.filter((a) => !favouriteSet.has(a.id)),
+    ],
+    [enabledActivities, favouriteSet],
+  );
 
   const toggleFavourite = useCallback(
     (id: string) => {
@@ -162,14 +171,6 @@ export default function App() {
     });
   }, [category, enabledActivities, favouriteSet, favouritesOnly, query]);
 
-  const featuredActivities = useMemo(
-    () =>
-      ['akwarium', 'rakieta', 'pizza']
-        .map((id) => enabledActivities.find((a) => a.id === id))
-        .filter((a): a is Activity => Boolean(a)),
-    [enabledActivities],
-  );
-
   const scrollToLibrary = () => {
     document.getElementById('zabawy')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -189,9 +190,9 @@ export default function App() {
   const activeActivity = activeActivityId ? activityById.get(activeActivityId) ?? null : null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[var(--page-bg)] text-[#40394f] transition-colors duration-500">
+    <div className="min-h-screen overflow-x-hidden bg-[#fbf8f2] text-[#40394f]">
       {/* ── Header ─────────────────────────────────────────── */}
-      <header className="site-header sticky top-0 z-40 border-b border-[#efe6dc]/80 bg-[var(--header-bg)] backdrop-blur-lg transition-colors duration-500">
+      <header className="sticky top-0 z-40 border-b border-[#efe6dc]/80 bg-[#fbf8f2]/85 backdrop-blur-lg">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
             type="button"
@@ -199,8 +200,8 @@ export default function App() {
             className="flex cursor-pointer items-center gap-2.5 rounded-full text-left"
             aria-label="Spokojny Świat Artura — początek strony"
           >
-            <span className="grid h-10 w-10 place-items-center rounded-[0.9rem] bg-gradient-to-br from-violet-300 via-fuchsia-200 to-amber-200 shadow-md shadow-violet-200/70 ring-2 ring-white/70">
-              <MascotIcon className="h-8 w-8" />
+            <span className="grid h-10 w-10 place-items-center rounded-[0.9rem] bg-gradient-to-br from-violet-400 to-fuchsia-400 text-xl shadow-md shadow-violet-200/70">
+              🧸
             </span>
             <span className="leading-tight">
               <span className="font-display block text-[15px] font-semibold text-[#453a5e] sm:text-base">
@@ -238,6 +239,14 @@ export default function App() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => changeChildMode(true)}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#eae1f3] bg-white/80 px-3.5 py-2.5 text-sm font-extrabold text-[#7a6d91] transition hover:border-violet-200 hover:text-violet-600"
+            >
+              <span aria-hidden="true">🧒</span>
+              <span className="hidden sm:inline">Tryb dziecka</span>
+            </button>
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
@@ -287,11 +296,11 @@ export default function App() {
       </header>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="paper-grain relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="hero-blob-1 animate-drift absolute -top-24 -left-24 h-80 w-80 rounded-full blur-3xl" />
-          <div className="hero-blob-2 animate-drift absolute top-10 right-[-6rem] h-96 w-96 rounded-full blur-3xl [animation-delay:2s]" />
-          <div className="hero-blob-3 absolute bottom-[-4rem] left-1/3 h-64 w-64 rounded-full blur-3xl" />
+          <div className="animate-drift absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[#ece3fa]/80 blur-3xl" />
+          <div className="animate-drift absolute top-10 right-[-6rem] h-96 w-96 rounded-full bg-[#fde8d8]/70 blur-3xl [animation-delay:2s]" />
+          <div className="absolute bottom-[-4rem] left-1/3 h-64 w-64 rounded-full bg-[#e3f2e6]/80 blur-3xl" />
         </div>
 
         <div className="relative mx-auto grid max-w-[1240px] items-center gap-8 px-4 pt-10 pb-10 sm:px-6 sm:pt-14 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10 lg:px-8 lg:pt-16 lg:pb-16">
@@ -359,184 +368,98 @@ export default function App() {
             </ul>
           </div>
 
-          {/* Hero artwork */}
-          <div className="relative mx-auto mt-2 w-full max-w-[420px] sm:mt-0 sm:max-w-[500px] lg:max-w-[540px]">
-            {/* soft decorative halo */}
-            <div className="pointer-events-none absolute -inset-5 rounded-[3.4rem] bg-gradient-to-br from-violet-200/50 via-pink-100/40 to-emerald-100/50 blur-2xl" aria-hidden="true" />
+          {/* Hero collage */}
+          <div className="relative mx-auto hidden h-[360px] w-full max-w-[440px] sm:block lg:h-[420px] lg:max-w-[470px]">
+            <div className="absolute inset-x-3 inset-y-2 rounded-[3rem] border border-white/80 bg-gradient-to-br from-[#efe7fa] via-[#fdf4ea] to-[#e5f3eb] shadow-[inset_0_1px_0_rgba(255,255,255,.9),0_30px_60px_-40px_rgba(90,63,130,.5)]" />
+            <div
+              className="absolute inset-6 rounded-[2.4rem] opacity-50"
+              aria-hidden="true"
+              style={{
+                backgroundImage: 'radial-gradient(#c7b7dc 1px, transparent 1px)',
+                backgroundSize: '22px 22px',
+              }}
+            />
 
-            <div className="relative overflow-hidden rounded-[2rem] border-[5px] border-white bg-white shadow-[0_35px_70px_-34px_rgba(90,63,130,0.65)] sm:rounded-[2.4rem] sm:border-[7px]">
-              <img
-                src={ARTWORK.hero}
-                alt="Ilustracja: miś, rybki, pociąg, rakieta i motyle w spokojnej pastelowej krainie"
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-                className="block aspect-[4/3] w-full object-cover"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#3a2c59]/30 via-transparent to-white/5" />
-
-              {/* Interactive hotspot */}
-              <button
-                type="button"
-                onClick={() => {
-                  const first = enabledActivities.find((a) => a.id === 'akwarium') ?? enabledActivities[0];
-                  if (first) openActivity(first);
-                }}
-                className="absolute bottom-3 left-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/80 bg-white/90 px-3.5 py-2 text-xs font-extrabold text-[#5b4a80] shadow-lg backdrop-blur-md transition hover:scale-105 active:scale-95 sm:bottom-4 sm:left-4 sm:px-4 sm:py-2.5 sm:text-sm"
-              >
-                <span aria-hidden="true" className="text-base">🐠</span>
-                Zacznij od akwarium
-                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h13M13 6l6 6-6 6" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Floating sticker chips */}
-            <span className="animate-float absolute -top-4 -left-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-white bg-white/95 px-3 py-1.5 text-[10px] font-extrabold text-[#8a7aa4] shadow-lg [--tilt:-6deg] sm:text-[11px]">
+            <span className="animate-float absolute top-3 left-2 z-30 inline-flex items-center gap-1.5 rounded-full border border-white bg-white/95 px-3 py-1.5 text-[11px] font-extrabold text-[#8a7aa4] shadow-md [--tilt:-4deg]">
               <span aria-hidden="true">🤫</span> tylko spokój
             </span>
             <span
-              className="animate-float absolute -right-3 top-[38%] z-10 inline-flex items-center gap-1 rounded-full border border-white bg-white/95 px-2.5 py-1.5 text-[10px] font-extrabold text-amber-700 shadow-lg [--tilt:6deg] sm:text-[11px]"
+              className="animate-float absolute top-[41%] right-0 z-30 inline-flex items-center gap-1 rounded-full border border-white bg-white/95 px-2.5 py-1 text-[11px] font-extrabold text-amber-600 shadow-md [--tilt:5deg]"
+              style={{ animationDelay: '1.4s' }}
+            >
+              <span aria-hidden="true">✨</span> offline
+            </span>
+
+            <button
+              type="button"
+              onClick={() => {
+                const aquarium = enabledActivities.find((a) => a.id === 'akwarium') ?? enabledActivities[0];
+                if (aquarium) openActivity(aquarium);
+              }}
+              className="animate-float absolute top-[19%] left-0 z-20 w-[168px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-violet-200/40 transition hover:scale-[1.03] [--tilt:-5deg]"
+            >
+              <ActivityIcon id="akwarium" className="h-14 w-14" />
+              <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Akwarium Artura</span>
+              <span className="mt-0.5 block text-[10.5px] font-bold text-[#70a06a]">przyroda</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const rocket = enabledActivities.find((a) => a.id === 'rakieta') ?? enabledActivities[0];
+                if (rocket) openActivity(rocket);
+              }}
+              className="animate-float absolute top-[4%] right-0 z-20 w-[152px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-fuchsia-200/40 transition hover:scale-[1.03] [--tilt:5deg]"
+              style={{ animationDelay: '0.8s' }}
+            >
+              <ActivityIcon id="rakieta" className="h-14 w-14" />
+              <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Rakieta</span>
+              <span className="mt-0.5 block text-[10.5px] font-bold text-[#5f8fb5]">pojazdy</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={scrollToLibrary}
+              className="absolute top-1/2 left-1/2 z-10 grid h-[104px] w-[104px] -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white bg-gradient-to-br from-[#fff8ec] to-[#fbe9f3] text-center shadow-xl shadow-violet-200/50 transition hover:scale-105"
+            >
+              <span>
+                <span className="font-display block text-[2rem] leading-none font-semibold text-[#6b5394]">
+                  {enabledActivities.length}
+                </span>
+                <span className="mt-0.5 block text-[10px] font-extrabold tracking-[0.14em] text-[#ad9cc4] uppercase">zabaw</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const bear = enabledActivities.find((a) => a.id === 'ubierz-misia') ?? enabledActivities[0];
+                if (bear) openActivity(bear);
+              }}
+              className="animate-float absolute bottom-[4%] left-[5%] z-20 w-[152px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-amber-200/40 transition hover:scale-[1.03] [--tilt:3deg]"
+              style={{ animationDelay: '2s' }}
+            >
+              <ActivityIcon id="ubierz-misia" className="h-14 w-14" />
+              <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Ubierz Misia</span>
+              <span className="mt-0.5 block text-[10.5px] font-bold text-[#c06f8c]">zwierzątka</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const pizza = enabledActivities.find((a) => a.id === 'pizza') ?? enabledActivities[0];
+                if (pizza) openActivity(pizza);
+              }}
+              className="animate-float absolute right-[3%] bottom-0 z-20 w-[164px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-rose-200/40 transition hover:scale-[1.03] [--tilt:-3deg]"
               style={{ animationDelay: '1.2s' }}
             >
-              <span aria-hidden="true">✨</span> {NATIVE_COUNT} zabaw
-            </span>
-            <span
-              className="animate-float absolute -bottom-3 right-8 z-10 inline-flex items-center gap-1.5 rounded-full border border-white bg-white/95 px-3 py-1.5 text-[10px] font-extrabold text-emerald-700 shadow-lg [--tilt:-3deg] sm:text-[11px]"
-              style={{ animationDelay: '2.1s' }}
-            >
-              <span aria-hidden="true">💜</span> bez porażek
-            </span>
-
-            {/* Doodle sparkles */}
-            <svg className="pointer-events-none absolute -top-3 right-10 h-8 w-8 text-[#f6c96f] opacity-90" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M20 2l3.4 11.6L35 17l-11.6 3.4L20 32l-3.4-11.6L5 17l11.6-3.4z" fill="currentColor" />
-            </svg>
-            <svg className="pointer-events-none absolute -bottom-4 left-6 h-6 w-6 text-[#c7b0ee] opacity-90" viewBox="0 0 40 40" aria-hidden="true">
-              <circle cx="20" cy="20" r="8" fill="currentColor" />
-              <circle cx="7" cy="8" r="3" fill="currentColor" />
-              <circle cx="33" cy="9" r="2.5" fill="currentColor" />
-            </svg>
-          </div>
-        </div>
-
-        <div className="relative mx-auto flex max-w-[1240px] flex-wrap items-center justify-center gap-3 px-4 pb-8 sm:px-6 lg:px-8">
-          <span className="text-[11px] font-bold text-[#9a8fad]">Dostosuj światło do pory dnia</span>
-          <MoodSwitcher mood={mood} onChange={handleMoodChange} />
-          <span className="hidden text-[11px] text-[#b0a5c1] sm:inline">· {MOOD_LABELS[mood]}</span>
-        </div>
-      </section>
-
-      {/* ── Illustrated worlds ─────────────────────────────── */}
-      <div className="art-wave" aria-hidden="true" />
-
-      <section className="relative px-4 pb-2 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[1240px] py-6 sm:py-8">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <p className="text-[11px] font-extrabold tracking-[0.16em] text-[#ac9fc2] uppercase">
-                Sześć małych światów
-              </p>
-              <h2 className="font-display mt-1 text-xl font-semibold text-[#453a5c] sm:text-2xl">
-                <span className="art-underline">Wybierz krainę</span>
-              </h2>
-            </div>
-            <p className="max-w-xs text-[12px] leading-relaxed text-[#9a8fad]">
-              Każda kraina kryje inne, spokojne zabawy. Dotknij obrazka, aby je zobaczyć.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-4">
-            {CATEGORIES.filter((entry) => entry.id !== 'wszystkie').map((entry) => (
-              <button
-                key={entry.id}
-                type="button"
-                onClick={() => {
-                  setCategory(entry.id);
-                  setFavouritesOnly(false);
-                  scrollToLibrary();
-                }}
-                className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-[1.3rem] border-[3px] border-white bg-white shadow-[0_18px_35px_-24px_rgba(91,70,130,0.6)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_25px_45px_-22px_rgba(91,70,130,0.6)] active:scale-[0.98] sm:rounded-[1.5rem]"
-                aria-label={`Pokaż zabawy z kategorii ${entry.label}`}
-              >
-                <img
-                  src={CATEGORY_ARTWORK[entry.id]}
-                  alt=""
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <span className="absolute inset-0 bg-gradient-to-t from-[#33264f]/85 via-[#33264f]/20 to-transparent" />
-                {(() => {
-                  const Icon = CATEGORY_ICONS[entry.id as keyof typeof CATEGORY_ICONS];
-                  return (
-                    <span className="absolute top-2 left-2 grid h-9 w-9 place-items-center rounded-full border border-white/90 bg-white/90 shadow-sm backdrop-blur-sm">
-                      {Icon ? <Icon className="h-6 w-6" /> : <span>{entry.emoji}</span>}
-                    </span>
-                  );
-                })()}
-                <span className="font-display absolute bottom-2 left-2.5 right-2.5 text-left text-[13px] font-semibold text-white drop-shadow-[0_2px_4px_rgba(40,25,70,0.8)] sm:text-sm">
-                  {entry.label}
-                </span>
-              </button>
-            ))}
+              <ActivityIcon id="pizza" className="h-14 w-14" />
+              <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Pizza</span>
+              <span className="mt-0.5 block text-[10.5px] font-bold text-[#a87a3f]">kreatywne</span>
+            </button>
           </div>
         </div>
       </section>
-
-      {/* ── Featured today ─────────────────────────────────── */}
-      {featuredActivities.length > 0 && (
-        <section className="px-4 pb-2 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-[1240px] pb-4 sm:pb-6">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-              <div>
-                <p className="text-[11px] font-extrabold tracking-[0.16em] text-[#ac9fc2] uppercase">
-                  Wyróżnione dziś
-                </p>
-                <h2 className="font-display mt-1 text-xl font-semibold text-[#453a5c] sm:text-2xl">
-                  <span className="art-underline">Trzy małe przygody</span>
-                </h2>
-              </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#eadff5] bg-white/80 px-3 py-1.5 text-[11px] font-extrabold text-[#8b78aa] shadow-sm">
-                <span aria-hidden="true" className="animate-heart">💜</span> wybrane dla Artura
-              </span>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              {featuredActivities.map((activity) => (
-                <button
-                  key={activity.id}
-                  type="button"
-                  onClick={() => openActivity(activity)}
-                  className="featured-card group relative aspect-[16/9] cursor-pointer overflow-hidden rounded-[1.6rem] border-[4px] border-white bg-white text-left shadow-[0_22px_45px_-28px_rgba(91,70,130,0.65)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_55px_-26px_rgba(91,70,130,0.7)] active:scale-[0.99]"
-                  aria-label={`Zagraj: ${activity.name}`}
-                >
-                  <img
-                    src={FEATURED_ARTWORK[activity.id]}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]"
-                  />
-                  <span className="absolute inset-0 bg-gradient-to-t from-[#2d2149]/90 via-[#2d2149]/35 to-transparent" />
-                  <span className="absolute top-3 left-3 grid h-10 w-10 place-items-center rounded-[0.9rem] border-2 border-white/90 bg-white/90 text-xl shadow-md">
-                    {activity.emoji}
-                  </span>
-                  <span className="font-display absolute right-3 bottom-3 left-3 flex items-end justify-between gap-2">
-                    <span className="block text-[17px] font-semibold text-white drop-shadow-[0_2px_5px_rgba(30,20,60,0.8)] sm:text-lg">
-                      {activity.name}
-                    </span>
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/70 bg-white/90 text-[#6b5394] shadow-md transition-transform group-hover:translate-x-1">
-                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M5 12h13M13 6l6 6-6 6" />
-                      </svg>
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── Library ────────────────────────────────────────── */}
       <section id="zabawy" className="relative scroll-mt-24 px-4 pb-14 sm:px-6 lg:px-8">
@@ -548,7 +471,7 @@ export default function App() {
                   Biblioteka zabaw
                 </p>
                 <h2 className="font-display mt-1.5 text-2xl font-semibold text-[#453a5c] sm:text-[1.9rem]">
-                  <span className="art-underline">Co dziś odkrywamy?</span>
+                  Co dziś odkrywamy?
                 </h2>
                 <p className="mt-1 text-sm text-[#8c819f]">
                   {filtered.length}{' '}
@@ -619,7 +542,7 @@ export default function App() {
                     : 'border-[#e9e0f0] bg-white/80 text-[#887a9f] hover:border-violet-200 hover:text-[#6a568d]'
                 }`}
               >
-                <AllIcon className="h-[17px] w-[17px]" aria-hidden="true" />
+                <span aria-hidden="true">🌈</span>
                 Wszystkie
                 <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-extrabold ${category === 'wszystkie' && !favouritesOnly ? 'bg-white/20 text-white' : 'bg-[#f3edfa] text-[#a293ba]'}`}>
                   {enabledActivities.length}
@@ -640,7 +563,7 @@ export default function App() {
                       : 'border-amber-200/80 bg-amber-50/80 text-amber-700 hover:border-amber-300'
                   }`}
                 >
-                  <StarIcon className="h-[17px] w-[17px]" aria-hidden="true" />
+                  <span aria-hidden="true">⭐</span>
                   Ulubione
                   <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-extrabold ${favouritesOnly ? 'bg-white/25' : 'bg-amber-100 text-amber-700'}`}>
                     {favouriteSet.size}
@@ -667,10 +590,7 @@ export default function App() {
                         : 'border-[#e9e0f0] bg-white/80 text-[#887a9f] hover:border-violet-200 hover:text-[#6a568d]'
                     }`}
                   >
-                    {(() => {
-                      const Icon = CATEGORY_ICONS[entry.id as keyof typeof CATEGORY_ICONS];
-                      return Icon ? <Icon className="h-[17px] w-[17px]" aria-hidden="true" /> : <span aria-hidden="true">{entry.emoji}</span>;
-                    })()}
+                    <span aria-hidden="true">{entry.emoji}</span>
                     {entry.label}
                     <span className={`text-[10px] font-extrabold ${selected ? 'text-white/60' : 'text-[#c0b4d2]'}`}>
                       {counts.get(entry.id)}
@@ -681,25 +601,27 @@ export default function App() {
             </div>
 
             {filtered.length > 0 ? (
-              <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
-                {filtered.map((activity) => (
-                  <ActivityCard
+              <div
+                key={`${category}|${favouritesOnly}|${query.trim()}`}
+                className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
+              >
+                {filtered.map((activity, index) => (
+                  <div
                     key={activity.id}
-                    activity={activity}
-                    isFavourite={favouriteSet.has(activity.id)}
-                    onPlay={openActivity}
-                    onToggleFavourite={toggleFavourite}
-                  />
+                    className="card-enter h-full"
+                    style={{ animationDelay: `${(index % 12) * 28}ms` }}
+                  >
+                    <ActivityCard
+                      activity={activity}
+                      isFavourite={favouriteSet.has(activity.id)}
+                      onPlay={openActivity}
+                      onToggleFavourite={toggleFavourite}
+                    />
+                  </div>
                 ))}
               </div>
             ) : (
-              <div className="relative mt-10 mb-6 flex flex-col items-center overflow-hidden rounded-3xl border border-dashed border-[#e3d8ee] bg-white/50 px-6 py-12 text-center">
-                <img
-                  src={ARTWORK.przyroda}
-                  alt=""
-                  className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.14]"
-                />
-                <div className="relative z-10 flex flex-col items-center">
+              <div className="mt-10 mb-6 flex flex-col items-center rounded-3xl border border-dashed border-[#e3d8ee] bg-white/50 px-6 py-12 text-center">
                 <span className="text-5xl" aria-hidden="true">
                   🔭
                 </span>
@@ -716,7 +638,6 @@ export default function App() {
                 >
                   Pokaż wszystkie zabawy
                 </button>
-                </div>
               </div>
             )}
 
@@ -787,13 +708,13 @@ export default function App() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────── */}
-      <footer className="border-t border-[#efe6dc] bg-[var(--footer-bg)] transition-colors duration-500">
+      <footer className="border-t border-[#efe6dc] bg-[#f6f0e8]">
         <div className="mx-auto max-w-[1240px] px-4 py-9 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row">
             <div className="max-w-md">
               <div className="flex items-center gap-2.5">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-300 via-fuchsia-200 to-amber-200 shadow-sm ring-2 ring-white/70" aria-hidden="true">
-                  <MascotIcon className="h-7 w-7" />
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-400 to-fuchsia-400 text-lg shadow-sm" aria-hidden="true">
+                  🧸
                 </span>
                 <span className="font-display text-[15px] font-semibold text-[#544766]">
                   Spokojny Świat Artura
@@ -850,11 +771,19 @@ export default function App() {
       </footer>
 
       {/* ── Overlays ───────────────────────────────────────── */}
+      {childMode && (
+        <ChildMode
+          activities={childActivities}
+          onPlay={openActivity}
+          onExit={() => changeChildMode(false)}
+        />
+      )}
+
       {activeActivity && (
         <Player
           activityId={activeActivity.id}
           title={activeActivity.name}
-          emoji={activeActivity.emoji}
+          origin={origin}
           onClose={closeActivity}
         />
       )}

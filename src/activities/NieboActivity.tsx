@@ -307,6 +307,8 @@ export default function NieboActivity() {
     <div className="act-stage stage">
       <div className={`night${done ? ' done' : ''}${paused ? ' paused' : ''}`}>
         <div className={`n-sky${fading ? ' fade' : ''}`}>
+          <i className="n-shoot n-shoot1" aria-hidden="true" />
+          <i className="n-shoot n-shoot2" aria-hidden="true" />
           <svg
             key={constellationKey}
             className="n-lines"
@@ -348,7 +350,12 @@ export default function NieboActivity() {
         </div>
 
         <div className={`n-msg${done && !fading ? ' show' : ''}`} aria-live="polite">
-          <p className="n-bravo">Brawo, Artur!</p>
+          <p className="n-bravo">
+            Brawo, Artur!{' '}
+            <span className="n-bravo-name">
+              {shape.name.charAt(0).toUpperCase() + shape.name.slice(1)}
+            </span>
+          </p>
           <button
             type="button"
             className="n-next"

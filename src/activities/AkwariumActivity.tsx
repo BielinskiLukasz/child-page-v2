@@ -293,6 +293,31 @@ export default function AkwariumActivity() {
       ctx.fillStyle = '#f3e6c8';
       ctx.fillRect(0, H - 22, W, 22);
 
+      // Soft, drifting light patches on the water surface (caustics)
+      ctx.save();
+      ctx.globalAlpha = 0.05;
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 4; i++) {
+        const cx =
+          (i * 0.27 + 0.08) * W + Math.sin(time * 0.25 + i * 1.7) * W * 0.06;
+        const cy = H * (0.16 + 0.17 * i) + Math.cos(time * 0.2 + i) * 12;
+        const rx = W * (0.1 + 0.045 * Math.sin(i * 2.1 + time * 0.1));
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, rx * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Gentle fish shadows on the sand, stronger when the fish is close to the bottom
+      for (const f of fish) {
+        const closeness = Math.max(0, 1 - f.y / H);
+        const alpha = 0.04 + 0.1 * closeness;
+        ctx.fillStyle = `rgba(91, 86, 117, ${alpha.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.ellipse(f.x, H - 12, f.size * 0.9, f.size * 0.16, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       drawPlant(W * 0.1, 130, '#9bd3ac', 0);
       drawPlant(W * 0.14, 90, '#b4e0bd', 1.5);
       drawPlant(W * 0.55, 110, '#9bd3ac', 3);

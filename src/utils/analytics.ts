@@ -375,6 +375,38 @@ function bump(level?: number, variant?: string | number | null, completed = fals
   });
 }
 
+export type AnalyticsEventType =
+  | 'activity_start'
+  | 'activity_end'
+  | 'activity_complete'
+  | 'level_complete'
+  | 'level_start'
+  | 'interaction';
+
+type AnalyticsListener = (type: AnalyticsEventType, payload: TrackPayload) => void;
+
+const listeners = new Set<AnalyticsListener>();
+
+/** Subscribe to the shared event bus (celebration effects). Returns an unsubscribe function. */
+export function onAnalyticsEvent(fn: AnalyticsListener): () => void {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+
+function emit(type: AnalyticsEventType, payload?: TrackPayload) {
+  if (listeners.size === 0) return;
+  const p = payload ?? {};
+  for (const fn of listeners) {
+    try {
+      fn(type, p);
+    } catch {
+      /* listeners must never break the app */
+    }
+  }
+}
+
 export function track(type: string, d: TrackPayload = {}) {
   try {
     const actId = d.activityId || (cur && cur.id) || null;
@@ -395,6 +427,7 @@ export function track(type: string, d: TrackPayload = {}) {
         break;
       case 'activity_complete':
         complete(d.level);
+        emit('activity_complete', d);
         break;
       case 'activity_restart':
         if (cur) {
@@ -416,9 +449,11 @@ export function track(type: string, d: TrackPayload = {}) {
         break;
       case 'level_start':
         bump(d.level, d.variant, false);
+        emit('level_start', d);
         break;
       case 'level_complete':
         bump(d.level, null, true);
+        emit('level_complete', d);
         break;
     }
   } catch {

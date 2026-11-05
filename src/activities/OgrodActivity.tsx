@@ -42,10 +42,18 @@ interface DropSpec {
   delay: string;
 }
 
+interface FireflySpec {
+  left: string;
+  top: string;
+  duration: string;
+  delay: string;
+}
+
 interface SceneEnvironment {
   combo: WeatherCombo;
   stars: StarSpec[];
   drops: DropSpec[];
+  fireflies: FireflySpec[];
 }
 
 interface PlantItem {
@@ -91,7 +99,19 @@ function createEnvironment(): SceneEnvironment {
     }
   }
 
-  return { combo, stars, drops };
+  const fireflies: FireflySpec[] = [];
+  if (combo.t === 'night') {
+    for (let f = 0; f < 5; f++) {
+      fireflies.push({
+        left: `${(8 + Math.random() * 84).toFixed(1)}%`,
+        top: `${(58 + Math.random() * 30).toFixed(1)}%`,
+        duration: `${(4.5 + Math.random() * 3).toFixed(2)}s`,
+        delay: `-${(Math.random() * 4).toFixed(2)}s`,
+      });
+    }
+  }
+
+  return { combo, stars, drops, fireflies };
 }
 
 const DAISY_ANGLES = Array.from({ length: 10 }, (_, i) => i * 36);
@@ -384,7 +404,7 @@ export default function OgrodActivity() {
     clearGarden();
   };
 
-  const { combo, stars, drops } = env;
+  const { combo, stars, drops, fireflies } = env;
 
   return (
     <div className="act-stage stage">
@@ -433,6 +453,20 @@ export default function OgrodActivity() {
               }}
             />
           ))}
+
+          {fireflies.length > 0 &&
+            fireflies.map((fly, idx) => (
+              <i
+                key={idx}
+                className="g-firefly"
+                style={{
+                  left: fly.left,
+                  top: fly.top,
+                  animationDuration: fly.duration,
+                  animationDelay: fly.delay,
+                }}
+              />
+            ))}
 
           {combo.w === 'breeze' &&
             [0, 1, 2, 3].map((k) => (
