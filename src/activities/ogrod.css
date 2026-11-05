@@ -1,0 +1,609 @@
+/* Illustrated art direction for Magiczny Ogród. Behaviour and growth timings live in OgrodActivity.tsx. */
+.garden {
+  isolation: isolate;
+  background: #cde9f6;
+}
+
+.g-sky {
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 62% 70% at 16% 2%, rgba(255, 252, 221, 0.68), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 90% 75%, rgba(255, 231, 197, 0.42), transparent 75%),
+    linear-gradient(165deg, #a9d9f2 0%, #d5edfa 53%, #edf3dc 100%);
+}
+
+.garden.tod-night .g-sky {
+  background:
+    radial-gradient(ellipse 46% 55% at 79% 9%, rgba(164, 183, 239, 0.25), transparent 70%),
+    radial-gradient(ellipse 80% 38% at 50% 100%, rgba(126, 141, 186, 0.34), transparent 76%),
+    linear-gradient(165deg, #111a43 0%, #293764 58%, #566181 100%);
+}
+
+.garden.wx-cloudy .g-sky,
+.garden.wx-rain .g-sky {
+  background:
+    radial-gradient(ellipse 65% 55% at 18% 0%, rgba(239, 244, 239, 0.38), transparent 72%),
+    linear-gradient(165deg, #93a9ba 0%, #c2d0da 58%, #dce0d5 100%);
+}
+
+.garden.wx-cloudy.tod-night .g-sky,
+.garden.wx-rain.tod-night .g-sky {
+  background:
+    radial-gradient(ellipse 52% 46% at 78% 7%, rgba(141, 158, 202, 0.2), transparent 72%),
+    linear-gradient(165deg, #1b2448 0%, #303d65 58%, #525f78 100%);
+}
+
+.g-landscape {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.garden.wx-rain .g-landscape {
+  filter: saturate(0.82) brightness(0.95);
+}
+
+.g-far-snow {
+  fill: rgba(240, 250, 239, 0.38);
+}
+
+.g-distant-trees {
+  fill: #75aa87;
+  opacity: 0.72;
+}
+
+.g-distant-trees path {
+  fill: none;
+  stroke: #679575;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.g-distant-trees path[d$='Z'] {
+  fill: #75aa87;
+  stroke: none;
+}
+
+.garden.tod-night .g-far-snow {
+  fill: rgba(190, 217, 215, 0.16);
+}
+
+.garden.tod-night .g-distant-trees {
+  fill: #3e675c;
+  opacity: 0.78;
+}
+
+.garden.tod-night .g-distant-trees path {
+  stroke: #385b52;
+}
+
+.garden.tod-night .g-distant-trees path[d$='Z'] {
+  fill: #3e675c;
+}
+
+.g-hill-contour {
+  fill: none;
+  stroke: rgba(232, 250, 203, 0.48);
+  stroke-width: 4;
+}
+
+.garden.tod-night .g-hill-contour {
+  stroke: rgba(172, 214, 197, 0.2);
+}
+
+.g-wx {
+  z-index: 2;
+}
+
+.g-tufts,
+.g-dew-layer,
+.g-puddles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.g-tufts {
+  z-index: 3;
+}
+
+.g-dew-layer,
+.g-puddles {
+  z-index: 4;
+}
+
+.garden .g-lawn,
+.garden.tod-night .g-lawn {
+  z-index: 8;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.g-plants {
+  z-index: 6;
+}
+
+.g-plant svg {
+  display: block;
+  filter: drop-shadow(0 3px 2px rgba(62, 89, 58, 0.18));
+}
+
+.garden.tod-night .g-plant svg {
+  filter:
+    drop-shadow(0 0 3px rgba(230, 244, 255, 0.52))
+    drop-shadow(0 3px 2px rgba(9, 24, 35, 0.32));
+}
+
+.g-contact-shadow {
+  fill: rgba(59, 87, 52, 0.2);
+}
+
+.garden.tod-night .g-contact-shadow {
+  fill: rgba(16, 38, 34, 0.3);
+}
+
+.g-leaf-vein,
+.g-petal-shine,
+.g-petal-vein,
+.g-cap-shine,
+.g-leaf-shine,
+.g-mush-stem-shine,
+.g-mush-gills {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.g-leaf-vein {
+  stroke: #4f976a;
+  stroke-width: 1.1;
+  opacity: 0.52;
+}
+
+.g-leaf-shine {
+  stroke: #efffdc;
+  stroke-width: 2;
+  opacity: 0.68;
+}
+
+.g-petal-shine {
+  stroke: #ffffff;
+  stroke-width: 2.3;
+  opacity: 0.52;
+}
+
+.g-petal-vein {
+  stroke: #ffffff;
+  stroke-width: 1.4;
+  opacity: 0.32;
+}
+
+.g-cap-shine {
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  opacity: 0.38;
+}
+
+.g-mush-stem-shine {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  opacity: 0.56;
+}
+
+.g-mush-gills {
+  stroke: #b9a58e;
+  stroke-width: 1.1;
+  opacity: 0.7;
+}
+
+.g-mush-spots {
+  fill: #fffaf0;
+  opacity: 0.86;
+}
+
+.g-pollen {
+  fill: #a87943;
+  opacity: 0.52;
+}
+
+/* Sun and moon are small illustrated objects rather than flat CSS discs. */
+.garden .g-orb,
+.garden.tod-night .g-orb {
+  top: 7%;
+  right: 8%;
+  width: clamp(78px, 13vw, 142px);
+  background: none;
+  box-shadow: none;
+}
+
+.g-orb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 14px rgba(255, 225, 137, 0.36));
+}
+
+.g-orb-halo {
+  fill: #ffeb9d;
+  opacity: 0.18;
+}
+
+.g-orb-rays {
+  fill: none;
+  stroke: #ffe49a;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.58;
+  transform-origin: 60px 60px;
+  animation: g-orb-spin 90s linear infinite;
+}
+
+.g-orb-disc {
+  fill: #ffdf7c;
+  stroke: rgba(255, 250, 214, 0.68);
+  stroke-width: 2;
+}
+
+.g-orb-shine {
+  fill: #ffffff;
+  opacity: 0.38;
+}
+
+.g-moon-craters {
+  fill: #d3d1c0;
+  opacity: 0.54;
+}
+
+.garden.tod-night .g-orb svg {
+  filter: drop-shadow(0 0 16px rgba(213, 226, 255, 0.28));
+}
+
+.garden.tod-night .g-orb-halo {
+  fill: #e5edff;
+  opacity: 0.14;
+}
+
+.garden.tod-night .g-orb-disc {
+  fill: #f0efdf;
+  stroke: rgba(255, 255, 244, 0.5);
+}
+
+@keyframes g-orb-spin {
+  to { transform: rotate(360deg); }
+}
+
+.g-star {
+  box-shadow: 0 0 5px rgba(244, 241, 255, 0.38);
+}
+
+/* Soft, layered clouds shared by the weather banks and the reset cloud. */
+.g-bank {
+  height: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: #f2f6f8;
+  opacity: 0.88;
+}
+
+.g-bank svg,
+.g-cloud svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.g-bank svg {
+  filter: drop-shadow(0 5px 5px rgba(80, 103, 126, 0.15));
+}
+
+.g-bank1 {
+  left: 5%;
+  top: 22%;
+  width: 27%;
+}
+
+.g-bank2 {
+  left: 59%;
+  top: 10%;
+  width: 21%;
+  opacity: 0.76;
+}
+
+.g-cloud-shadow {
+  fill: currentColor;
+  opacity: 0.18;
+}
+
+.g-cloud-body {
+  fill: currentColor;
+}
+
+.g-cloud-under {
+  fill: #9eb8ca;
+  opacity: 0.2;
+}
+
+.g-cloud-shine {
+  fill: #ffffff;
+  opacity: 0.48;
+}
+
+.garden.wx-cloudy .g-bank,
+.garden.wx-rain .g-bank {
+  color: #bac6cf;
+  background: none;
+  box-shadow: none;
+}
+
+.garden.wx-rain .g-bank {
+  color: #aebdca;
+}
+
+.garden.tod-night .g-bank {
+  color: #6e7c9d;
+  background: none;
+  box-shadow: none;
+}
+
+.g-cloud {
+  color: #ffffff;
+  filter: drop-shadow(0 5px 5px rgba(82, 111, 140, 0.16));
+}
+
+.garden.tod-night .g-cloud {
+  color: #c4cdea;
+}
+
+.g-cloud svg {
+  opacity: 0.98;
+}
+
+/* Daytime birds, kept tiny and slow so they remain background detail. */
+.g-bird {
+  width: clamp(30px, 4vw, 48px);
+  opacity: 0.48;
+}
+
+.g-bird svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.g-bird path {
+  fill: none;
+  stroke: #688195;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-origin: 50% 60%;
+  animation: g-bird-flap 2.8s ease-in-out infinite;
+}
+
+.g-bird1 {
+  left: 10%;
+  top: 19%;
+  animation: g-bird-travel 38s linear infinite;
+}
+
+.g-bird2 {
+  left: 25%;
+  top: 32%;
+  width: clamp(24px, 3vw, 38px);
+  animation: g-bird-travel 44s linear -21s infinite;
+}
+
+@keyframes g-bird-travel {
+  0% { transform: translate(0, 0); opacity: 0; }
+  8% { opacity: 0.45; }
+  88% { opacity: 0.45; }
+  100% { transform: translate(66vw, -4vh); opacity: 0; }
+}
+
+@keyframes g-bird-flap {
+  0%, 100% { transform: scaleY(0.75); }
+  50% { transform: scaleY(1.12); }
+}
+
+.g-drop {
+  top: -24px;
+  width: 3px;
+  height: 17px;
+  border-radius: 60% 60% 70% 70%;
+  background: linear-gradient(to bottom, rgba(220, 242, 255, 0.15), #83bce0 70%);
+  opacity: 0.68;
+  filter: drop-shadow(0 1px 1px rgba(71, 119, 154, 0.2));
+}
+
+.garden.tod-night .g-drop {
+  background: linear-gradient(to bottom, rgba(216, 232, 255, 0.12), #a9c7e5 72%);
+}
+
+.g-seed-drift {
+  left: -4%;
+  width: 9px;
+  height: 13px;
+  border-radius: 80% 12% 80% 12%;
+  background: #fff4d7;
+  box-shadow: 0 0 5px rgba(255, 250, 221, 0.52);
+  opacity: 0;
+  animation: g-seed-drift 10s linear infinite;
+}
+
+@keyframes g-seed-drift {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.75; }
+  45% { transform: translate(48vw, -25px) rotate(190deg); }
+  85% { opacity: 0.65; }
+  100% { transform: translate(108vw, 24px) rotate(420deg); opacity: 0; }
+}
+
+.g-mist {
+  height: clamp(32px, 6vw, 62px);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(205, 228, 224, 0.22), rgba(205, 228, 224, 0) 72%);
+  filter: blur(7px);
+  opacity: 0.5;
+  animation: g-mist 18s ease-in-out infinite alternate;
+}
+
+@keyframes g-mist {
+  from { transform: translateX(-5%) scaleX(0.92); opacity: 0.28; }
+  to { transform: translateX(18%) scaleX(1.08); opacity: 0.58; }
+}
+
+/* Rainwater sits below the flowers and never intercepts planting touches. */
+.g-puddle {
+  position: absolute;
+  display: block;
+  aspect-ratio: 3.4 / 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(ellipse at 34% 22%, rgba(255, 255, 255, 0.72), transparent 24%),
+    radial-gradient(ellipse at 50% 45%, #c9e6f1 0%, #91c5dc 58%, #74aecb 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.64),
+    inset 0 -3px 5px rgba(69, 125, 156, 0.25),
+    0 2px 3px rgba(70, 105, 100, 0.16);
+  opacity: 0.78;
+}
+
+.g-puddle-ring {
+  position: absolute;
+  inset: 24% 31%;
+  display: block;
+  border: 1.5px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  animation: g-puddle-ring 3.2s ease-out infinite;
+}
+
+@keyframes g-puddle-ring {
+  0% { transform: scale(0.25); opacity: 0; }
+  18% { opacity: 0.75; }
+  100% { transform: scale(2.25); opacity: 0; }
+}
+
+.g-tuft {
+  position: absolute;
+  display: block;
+  transform-origin: 50% 100%;
+}
+
+.g-tuft svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.g-tuft path {
+  fill: none;
+  stroke: #5b9f6c;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.g-tuft .g-tuft-light {
+  stroke: #c2e7a5;
+  stroke-width: 1.6;
+  opacity: 0.55;
+}
+
+.garden.tod-night .g-tuft path {
+  stroke: #356b58;
+}
+
+.garden.tod-night .g-tuft .g-tuft-light {
+  stroke: #78a68b;
+  opacity: 0.4;
+}
+
+.g-dew {
+  position: absolute;
+  display: block;
+  border-radius: 65% 38% 62% 38%;
+  transform: rotate(45deg);
+  background: radial-gradient(circle at 30% 25%, #ffffff 0 16%, #dff8f2 32%, #8bcac1 100%);
+  box-shadow: 0 0 5px rgba(255, 255, 235, 0.58);
+  animation: g-dew 5s ease-in-out infinite;
+}
+
+@keyframes g-dew {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.95; }
+}
+
+.g-front-grass {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  z-index: 7;
+  display: block;
+  width: 100%;
+  height: min(20vh, 180px);
+  fill: #6cab73;
+  pointer-events: none;
+}
+
+.g-front-soil {
+  fill: #629b67;
+}
+
+.garden.tod-night .g-front-grass {
+  fill: #346753;
+}
+
+.garden.tod-night .g-front-soil {
+  fill: #2e5c4c;
+}
+
+.g-clear-ring {
+  position: absolute;
+  top: 69%;
+  left: 50%;
+  z-index: 12;
+  width: 76px;
+  height: 76px;
+  margin: -38px 0 0 -38px;
+  border: 3px solid rgba(255, 255, 255, 0.74);
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.32);
+  pointer-events: none;
+  animation: g-clear-ring 0.9s ease-out forwards;
+}
+
+@keyframes g-clear-ring {
+  from { transform: scale(0.25); opacity: 0.9; }
+  to { transform: scale(7); opacity: 0; }
+}
+
+@media (max-width: 560px) {
+  .g-bank1 { width: 34%; }
+  .g-bank2 { width: 28%; left: 61%; }
+  .g-front-grass { height: 15vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden .g-bird,
+  .garden .g-seed-drift,
+  .garden .g-puddle-ring,
+  .garden .g-orb-rays {
+    display: none;
+  }
+
+  .garden .g-mist {
+    opacity: 0.25;
+  }
+
+  .garden .g-clear-ring {
+    display: none;
+  }
+}
