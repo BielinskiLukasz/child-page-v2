@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { getNativeActivity } from '../activities';
 import { Analytics } from '../utils/analytics';
 import {
@@ -12,7 +12,7 @@ import {
 interface Props {
   activityId: string;
   title: string;
-  emoji?: string;
+  origin?: { x: number; y: number } | null;
   onClose: () => void;
 }
 
@@ -76,19 +76,12 @@ function SleepingMoonScreen() {
   );
 }
 
-export default function Player({ activityId, title, emoji = '🧸', onClose }: Props) {
+export default function Player({ activityId, title, origin, onClose }: Props) {
   const NativeActivity = getNativeActivity(activityId);
   const backRef = useRef<HTMLButtonElement>(null);
 
   const [playState, setPlayState] = useState(() => loadPlaytime());
   const [expired, setExpired] = useState(() => isPlaytimeExpired());
-  const [titleVisible, setTitleVisible] = useState(true);
-
-  useEffect(() => {
-    setTitleVisible(true);
-    const timer = window.setTimeout(() => setTitleVisible(false), 3200);
-    return () => window.clearTimeout(timer);
-  }, [activityId]);
 
   useEffect(() => {
     const initial = loadPlaytime();
@@ -151,16 +144,15 @@ export default function Player({ activityId, title, emoji = '🧸', onClose }: P
 
   return (
     <section
-      className="scene-frame fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
+      className="player-reveal fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
+      style={
+        {
+          '--ox': origin ? `${origin.x}px` : '50%',
+          '--oy': origin ? `${origin.y}px` : '50%',
+        } as CSSProperties
+      }
       aria-label={title}
     >
-      {!expired && (
-        <div className={`scene-title-pill${titleVisible ? '' : ' fade-away'}`} aria-hidden="true">
-          <span className="scene-emoji">{emoji}</span>
-          <span className="truncate">{title}</span>
-        </div>
-      )}
-
       <button
         ref={backRef}
         type="button"
@@ -188,7 +180,7 @@ export default function Player({ activityId, title, emoji = '🧸', onClose }: P
         <SleepingMoonScreen />
       ) : (
         <div
-          className="animate-scene-in h-full w-full origin-center"
+          className="h-full w-full"
           style={{ opacity: stageOpacity }}
           onPointerDownCapture={() => Analytics.recordStageTouch()}
           onKeyDownCapture={() => Analytics.recordStageTouch()}
