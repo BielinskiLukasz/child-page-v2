@@ -1,0 +1,685 @@
+/* Illustrated art direction for Nocne Niebo. Constellation data, rules and timing live in NieboActivity.tsx. */
+
+/* ── Sky and atmosphere ─────────────────────────────────────────────── */
+.act-stage .night {
+  background:
+    radial-gradient(ellipse 58% 42% at 16% 10%, rgba(140, 104, 204, 0.3), transparent 70%),
+    radial-gradient(ellipse 50% 46% at 88% 34%, rgba(72, 152, 196, 0.22), transparent 72%),
+    radial-gradient(ellipse 85% 34% at 50% 102%, rgba(150, 110, 190, 0.34), transparent 74%),
+    radial-gradient(ellipse at 50% 30%, #2a3a74, #141c45 70%);
+}
+
+/* The shared ambient overlay becomes a soft night vignette instead of a daylight glow. */
+.act-stage.stage:has(> .night)::after {
+  background: radial-gradient(130% 92% at 50% 44%, transparent 58%, rgba(4, 7, 26, 0.45) 100%);
+}
+
+.night .n-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.night .n-milkyway {
+  position: absolute;
+  top: 31%;
+  right: -30%;
+  left: -30%;
+  height: 40%;
+  transform: rotate(-22deg);
+  background:
+    radial-gradient(ellipse 48% 44% at 46% 50%, rgba(214, 204, 255, 0.17), rgba(214, 204, 255, 0) 70%),
+    radial-gradient(ellipse 30% 30% at 62% 46%, rgba(150, 214, 230, 0.1), rgba(150, 214, 230, 0) 70%),
+    radial-gradient(ellipse 26% 34% at 34% 56%, rgba(247, 168, 201, 0.08), rgba(247, 168, 201, 0) 70%);
+}
+
+.night .n-starfield {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.night .n-starfield circle {
+  fill: #f4f1ff;
+}
+
+.night .n-starfield .n-dust {
+  fill: #ddd6ff;
+}
+
+.night .n-tw1 {
+  animation: n-twinkle 4.6s ease-in-out infinite;
+}
+
+.night .n-tw2 {
+  animation: n-twinkle 6.2s ease-in-out -2.1s infinite;
+}
+
+.night .n-tw3 {
+  animation: n-twinkle 7.8s ease-in-out -4.4s infinite;
+}
+
+@keyframes n-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.night .n-accent {
+  position: absolute;
+  display: block;
+  transform: translate(-50%, -50%);
+  animation: n-accent-twinkle 5.6s ease-in-out infinite;
+}
+
+.night .n-accent svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: currentColor;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+@keyframes n-accent-twinkle {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.82); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Rare shooting stars crossing behind the constellation. */
+.night .n-meteor {
+  position: absolute;
+  width: clamp(80px, 14vw, 170px);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 243, 196, 0), rgba(255, 243, 196, 0.9));
+  opacity: 0;
+}
+
+.night .n-meteor::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: #fffaf0;
+  box-shadow: 0 0 8px 3px rgba(255, 243, 196, 0.7);
+}
+
+.night .n-meteor1 {
+  top: 9%;
+  left: -10%;
+  animation: n-meteor 23s linear 4s infinite;
+}
+
+.night .n-meteor2 {
+  top: 24%;
+  left: 18%;
+  animation: n-meteor 31s linear 15s infinite;
+}
+
+@keyframes n-meteor {
+  0% { opacity: 0; transform: rotate(18deg) translateX(0); }
+  2% { opacity: 1; }
+  8% { opacity: 0; transform: rotate(18deg) translateX(75vw); }
+  100% { opacity: 0; transform: rotate(18deg) translateX(75vw); }
+}
+
+/* Sleepy crescent moon, below the playtime hourglass. */
+.night .n-moon {
+  position: absolute;
+  top: calc(var(--safe-t) + 10%);
+  right: calc(var(--safe-r) + 8%);
+  width: clamp(54px, 11vmin, 104px);
+  aspect-ratio: 1;
+}
+
+.night .n-moon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.night .n-moon-glow {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: n-moon-glow 7s ease-in-out infinite;
+}
+
+@keyframes n-moon-glow {
+  0%, 100% { opacity: 0.75; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ── Horizon ────────────────────────────────────────────────────────── */
+.night .n-horizon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: clamp(64px, 15vh, 150px);
+  color: #0d1431;
+}
+
+@media (orientation: landscape) {
+  .night .n-horizon {
+    height: clamp(48px, 10vh, 112px);
+  }
+}
+
+.night .n-hills {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.night .n-hill-far {
+  fill: #1a2350;
+}
+
+.night .n-hill-near {
+  fill: #0d1431;
+}
+
+.night .n-hill-rim {
+  fill: none;
+  stroke: rgba(176, 188, 240, 0.3);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.night .n-hill-rim-near {
+  stroke: rgba(150, 165, 230, 0.18);
+}
+
+.night .n-village {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  border-radius: 50%;
+  background: #ffd98a;
+  box-shadow: 0 0 6px 2px rgba(255, 217, 138, 0.45);
+  opacity: 0.75;
+}
+
+.night .n-hz {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  transform: translateX(-50%);
+}
+
+.night .n-hz-house {
+  left: 15%;
+  bottom: 46%;
+  height: 44%;
+  aspect-ratio: 64 / 56;
+}
+
+.night .n-hz-trees {
+  left: 40%;
+  bottom: 49%;
+  height: 52%;
+  aspect-ratio: 90 / 70;
+}
+
+.night .n-hz-scope {
+  left: 82%;
+  bottom: 51%;
+  height: 42%;
+  aspect-ratio: 1;
+}
+
+.night .n-hz-glow {
+  opacity: 0.26;
+  animation: n-window 5s ease-in-out infinite;
+}
+
+@keyframes n-window {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.34; }
+}
+
+.night .n-hz-glint {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: n-spark-twinkle 3s ease-in-out infinite;
+}
+
+/* ── Play square ────────────────────────────────────────────────────── */
+.night .n-sky {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.night .n-sky.fade {
+  transform: scale(0.96);
+}
+
+/* A soft dark pool behind the constellation keeps decorative stars from competing with tappable ones. */
+.night .n-lens {
+  position: absolute;
+  inset: -8%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(9, 13, 40, 0.42) 0%,
+    rgba(9, 13, 40, 0.22) 45%,
+    rgba(9, 13, 40, 0) 70%
+  );
+  pointer-events: none;
+}
+
+.night .n-figure-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.night .n-nebula {
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+
+.night.done .n-nebula {
+  opacity: 1;
+}
+
+.night .n-figure {
+  opacity: 0;
+  transform: scale(0.94);
+  transform-origin: 50px 50px;
+  transition: opacity 1.6s ease 0.2s, transform 1.6s ease 0.2s;
+}
+
+.night.done .n-figure {
+  opacity: 0.92;
+  transform: scale(1);
+}
+
+/* Lines: dotted guide trail, soft glow and a crisp core. */
+.night .n-ghost {
+  stroke: rgba(196, 207, 255, 0.42);
+  stroke-width: 0.7;
+  stroke-dasharray: 0.01 2.4;
+  transition: opacity 0.6s ease;
+}
+
+.night .n-ghost.on {
+  opacity: 0;
+}
+
+.night .n-halo {
+  stroke: #ffd98a;
+  stroke-width: 2.8;
+  stroke-dasharray: var(--len, 100);
+  stroke-dashoffset: var(--len, 100);
+  opacity: 0;
+}
+
+.night .n-halo.on {
+  stroke-dashoffset: 0;
+  opacity: 0.3;
+  transition: stroke-dashoffset 0.9s ease-out, opacity 0.9s ease-out;
+}
+
+.night.done .n-halo.on {
+  opacity: 0.5;
+  animation: n-line-glow 3.6s ease-in-out infinite;
+}
+
+@keyframes n-line-glow {
+  0%, 100% { opacity: 0.38; }
+  50% { opacity: 0.62; }
+}
+
+.night .n-line {
+  stroke: #fff6d8;
+  stroke-width: 0.85;
+  opacity: 0.95;
+}
+
+.night.done .n-line {
+  filter: none;
+}
+
+/* A small light travels around the finished outline. */
+.night .n-trace,
+.night .n-trace-halo {
+  stroke-dasharray: var(--dash, 4) var(--gap, 96);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.night .n-trace {
+  stroke: #ffffff;
+  stroke-width: 1.2;
+}
+
+.night .n-trace-halo {
+  stroke: #ffe9a8;
+  stroke-width: 4.2;
+}
+
+.night.done .n-trace {
+  opacity: 0.95;
+  animation: n-trace 7s linear infinite;
+}
+
+.night.done .n-trace-halo {
+  opacity: 0.32;
+  animation: n-trace 7s linear infinite;
+}
+
+@keyframes n-trace {
+  from { stroke-dashoffset: var(--cyc, 100); }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Tappable stars ─────────────────────────────────────────────────── */
+.night .n-star::before {
+  width: 50px;
+  height: 50px;
+  margin: -25px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 240, 190, 0.62) 0%,
+    rgba(255, 220, 140, 0.2) 42%,
+    rgba(255, 220, 140, 0) 70%
+  );
+  box-shadow: none;
+  opacity: 0;
+  transform: scale(0.55);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.night .n-star.on::before {
+  background: radial-gradient(
+    circle,
+    rgba(255, 240, 190, 0.62) 0%,
+    rgba(255, 220, 140, 0.2) 42%,
+    rgba(255, 220, 140, 0) 70%
+  );
+  box-shadow: none;
+  opacity: 1;
+  transform: scale(1);
+  animation: n-halo-breathe 3.6s ease-in-out infinite;
+}
+
+@keyframes n-halo-breathe {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.night .n-star-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.night .n-star-invite {
+  fill: none;
+  stroke: rgba(201, 212, 255, 0.7);
+  stroke-width: 1;
+  stroke-dasharray: 2.4 3.1;
+  opacity: 0.45;
+  animation: n-invite 3.2s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  transition: opacity 0.4s ease;
+}
+
+.night .n-star.on .n-star-invite {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes n-invite {
+  0%, 100% { opacity: 0.22; transform: scale(0.82) rotate(0deg); }
+  50% { opacity: 0.72; transform: scale(1.1) rotate(25deg); }
+}
+
+.night .n-star-shape {
+  fill: #cfd8ff;
+  stroke: #cfd8ff;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  opacity: 0.85;
+  transform: scale(0.7);
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    fill 0.4s ease,
+    stroke 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.night .n-star.on .n-star-shape {
+  fill: #ffe7a0;
+  stroke: #fff4cc;
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .night .n-star:not(.on):hover .n-star-shape {
+    opacity: 1;
+    transform: scale(0.82);
+  }
+}
+
+.night .n-star-spikes {
+  fill: none;
+  stroke: rgba(255, 246, 214, 0.75);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.5s ease 0.1s, transform 0.6s ease 0.1s;
+}
+
+.night .n-star.on .n-star-spikes {
+  opacity: 0.8;
+  transform: scale(1);
+}
+
+.night .n-star-glint {
+  fill: #ffffff;
+  opacity: 0;
+  transition: opacity 0.4s ease 0.15s;
+}
+
+.night .n-star.on .n-star-glint {
+  opacity: 0.9;
+}
+
+.night .n-star-burst {
+  opacity: 0;
+}
+
+.night .n-star-burst path {
+  fill: none;
+  stroke: #fff3c4;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.night .n-star.on .n-star-burst {
+  animation: n-burst 0.75s ease-out both;
+}
+
+@keyframes n-burst {
+  0% { opacity: 0.95; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Completion sparkles bursting from the centre of the shape. */
+.night .n-sparks {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.night .n-spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--s, 10px);
+  height: var(--s, 10px);
+  background: #fff3c4;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  opacity: 0;
+}
+
+.night.done .n-spark {
+  animation: n-spark 1.5s ease-out var(--delay, 0s) both;
+}
+
+@keyframes n-spark {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  15% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx, 0) * 0.9vmin), calc(-50% + var(--dy, 0) * 0.9vmin)) scale(1)
+      rotate(90deg);
+  }
+}
+
+/* ── Praise and Dalej ───────────────────────────────────────────────── */
+.night .n-bravo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em 0.45em;
+  color: #fff6d8;
+  font-family: "Fredoka", ui-rounded, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 14px rgba(255, 221, 140, 0.55), 0 2px 8px rgba(10, 14, 42, 0.85);
+}
+
+.night .n-msg.show .n-bravo {
+  animation: n-bravo-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes n-bravo-in {
+  from { opacity: 0; transform: translateY(-12px) scale(0.9); }
+  to { opacity: 1; transform: none; }
+}
+
+.night .n-bravo-name {
+  display: inline-block;
+  padding: 0.06em 0.62em 0.12em;
+  border: 1px solid rgba(255, 233, 168, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 233, 168, 0.14);
+  color: #ffe9a8;
+  font-size: 0.74em;
+  text-shadow: none;
+  box-shadow: 0 0 18px rgba(255, 220, 140, 0.22);
+}
+
+.night .n-bravo-spark {
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  overflow: visible;
+  fill: #ffe9a8;
+  filter: drop-shadow(0 0 4px rgba(255, 233, 168, 0.8));
+  animation: n-spark-twinkle 2.4s ease-in-out infinite;
+}
+
+.night .n-bravo-spark:last-child {
+  animation-delay: -1.2s;
+}
+
+@keyframes n-spark-twinkle {
+  0%, 100% { opacity: 0.55; transform: scale(0.85) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(20deg); }
+}
+
+.night .n-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 52px;
+  padding: 0.5rem 1.15rem 0.5rem 1.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff6d6 0%, #ffdf8f 100%);
+  color: #3a3566;
+  font-family: "Fredoka", ui-rounded, system-ui, sans-serif;
+  font-size: 1.12rem;
+  font-weight: 600;
+  box-shadow:
+    0 0 0 4px rgba(255, 233, 168, 0.16),
+    0 10px 26px -10px rgba(255, 206, 110, 0.7);
+  transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.night .n-msg.show .n-next:not(:disabled) {
+  animation: n-next-glow 2.6s ease-in-out 2.2s infinite;
+}
+
+.night .n-next:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.night .n-next:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.night .n-next:disabled {
+  cursor: default;
+  filter: saturate(0.6);
+}
+
+.night .n-next-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes n-next-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 4px rgba(255, 233, 168, 0.16),
+      0 10px 26px -10px rgba(255, 206, 110, 0.7);
+  }
+  50% {
+    box-shadow:
+      0 0 0 9px rgba(255, 233, 168, 0.1),
+      0 10px 30px -8px rgba(255, 206, 110, 0.85);
+  }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────── */
+/* The global rule already stops CSS animations and transitions; moving-only effects are hidden entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .night .n-meteor,
+  .night .n-trace,
+  .night .n-trace-halo,
+  .night .n-sparks,
+  .night .n-star-burst {
+    display: none;
+  }
+}
