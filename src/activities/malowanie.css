@@ -1,0 +1,17 @@
+/* Illustrated art direction for Malowanie Światłem. The night backdrop, glowing marks, dust motes and
+   touch sparks are drawn on the canvas from MalowanieActivity.tsx; this file only handles framing. */
+
+.act-stage.stage:has(.paint-canvas) {
+  background: #1a1836;
+}
+
+.paint-canvas {
+  background: #1a1836;
+  border-radius: 0;
+  box-shadow: inset 0 0 60px rgba(8, 6, 22, 0.55);
+}
+
+.paint-canvas:focus-visible {
+  outline: 4px solid #b9a8f0;
+  outline-offset: -6px;
+}
