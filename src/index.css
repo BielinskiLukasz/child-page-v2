@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "./activities/activities.css";
+@import "./activities/ogrod.css";
+@import "./activities/niebo.css";
+@import "./activities/dzien-i-noc.css";
 
 @theme {
   --font-display: "Fredoka", ui-rounded, system-ui, sans-serif;
@@ -174,35 +177,6 @@ body {
   100% { transform: translate(var(--dx, 0), var(--dy, -80px)) scale(0); opacity: 0; }
 }
 
-/* Nocne Niebo: shooting stars, two on offset timers */
-.n-shoot {
-  position: absolute;
-  top: 14%;
-  left: -12%;
-  width: 90px;
-  height: 2.5px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, rgba(255, 243, 196, 0.9), rgba(255, 243, 196, 0));
-  opacity: 0;
-  pointer-events: none;
-  animation: n-shoot 21s linear infinite;
-}
-.n-shoot2 {
-  top: 34%;
-  animation-delay: 10.5s;
-  animation-duration: 24s;
-}
-@keyframes n-shoot {
-  0% { transform: translate(0, 0) rotate(-16deg); opacity: 0; }
-  3% { opacity: 0.9; }
-  11% { transform: translate(78vw, 30vh) rotate(-16deg); opacity: 0; }
-  100% { transform: translate(78vw, 30vh) rotate(-16deg); opacity: 0; }
-}
-.n-bravo-name {
-  display: inline-block;
-  color: #ffe9a8;
-}
-
 /* Magiczny Ogród: wandering fireflies on night lawns */
 .g-firefly {
   width: 5px;
@@ -230,15 +204,6 @@ body {
 @keyframes bg-breathe {
   0%, 100% { background-position: 0% 40%; }
   50% { background-position: 100% 60%; }
-}
-
-/* Dzień i Noc: warm dusk layer, peaks mid-transition */
-.dn-dusk {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(#f7b98a, #e58fa5 55%, #7d6aa8);
-  opacity: var(--dusk, 0);
-  pointer-events: none;
 }
 
 .card-shadow {
