@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ACTIVITIES } from '../data/activities';
-import ActivityIcon from './ActivityIcon';
 import {
   Analytics,
   type AnalyticsPeriod,
@@ -473,7 +472,9 @@ export default function ParentSettingsModal({ menuEntries, onChangeMenu, onClose
                           onChange={() => toggleEnabled(entry.id)}
                           className="h-5 w-5 shrink-0 accent-violet-600"
                         />
-                        <ActivityIcon id={act.id} fallback={act.emoji} className="h-8 w-8" />
+                        <span className="text-lg" aria-hidden="true">
+                          {act.emoji}
+                        </span>
                         <span
                           className={`truncate text-sm font-bold ${
                             entry.on ? 'text-[#463d59]' : 'text-[#b2a8c4] line-through'

@@ -12,6 +12,7 @@ import {
 interface Props {
   activityId: string;
   title: string;
+  emoji?: string;
   onClose: () => void;
 }
 
@@ -75,12 +76,19 @@ function SleepingMoonScreen() {
   );
 }
 
-export default function Player({ activityId, title, onClose }: Props) {
+export default function Player({ activityId, title, emoji = '🧸', onClose }: Props) {
   const NativeActivity = getNativeActivity(activityId);
   const backRef = useRef<HTMLButtonElement>(null);
 
   const [playState, setPlayState] = useState(() => loadPlaytime());
   const [expired, setExpired] = useState(() => isPlaytimeExpired());
+  const [titleVisible, setTitleVisible] = useState(true);
+
+  useEffect(() => {
+    setTitleVisible(true);
+    const timer = window.setTimeout(() => setTitleVisible(false), 3200);
+    return () => window.clearTimeout(timer);
+  }, [activityId]);
 
   useEffect(() => {
     const initial = loadPlaytime();
@@ -143,9 +151,16 @@ export default function Player({ activityId, title, onClose }: Props) {
 
   return (
     <section
-      className="fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
+      className="scene-frame fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
       aria-label={title}
     >
+      {!expired && (
+        <div className={`scene-title-pill${titleVisible ? '' : ' fade-away'}`} aria-hidden="true">
+          <span className="scene-emoji">{emoji}</span>
+          <span className="truncate">{title}</span>
+        </div>
+      )}
+
       <button
         ref={backRef}
         type="button"
@@ -173,7 +188,7 @@ export default function Player({ activityId, title, onClose }: Props) {
         <SleepingMoonScreen />
       ) : (
         <div
-          className="h-full w-full"
+          className="animate-scene-in h-full w-full origin-center"
           style={{ opacity: stageOpacity }}
           onPointerDownCapture={() => Analytics.recordStageTouch()}
           onKeyDownCapture={() => Analytics.recordStageTouch()}
