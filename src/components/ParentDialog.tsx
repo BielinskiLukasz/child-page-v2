@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { ARTWORK } from '../data/artwork';
+import { LearningIcon, MascotIcon, MoonIcon, SparkleIcon, SunIcon } from './ArtIcons';
 
 interface Props {
   onClose: () => void;
@@ -7,22 +9,26 @@ interface Props {
 
 const tiles = [
   {
-    emoji: '⏳',
+    Icon: SunIcon,
+    tint: 'bg-[#fdf0d5] text-[#d59a3e]',
     title: 'Dzienny limit czasu',
     text: 'Domyślnie 20 minut. Liczy się tylko czas, gdy zabawa jest widoczna. Gdy czas minie, pojawia się spokojny ekran księżyca.',
   },
   {
-    emoji: '🧩',
+    Icon: LearningIcon,
+    tint: 'bg-[#eee8fb] text-[#8f7fd1]',
     title: 'Menu dla dziecka',
     text: 'Ukryj zabawy, które nie są jeszcze odpowiednie, zmień ich kolejność i dodaj ulubione — wszystko za prostą bramką matematyczną.',
   },
   {
-    emoji: '📊',
+    Icon: SparkleIcon,
+    tint: 'bg-[#fde8ee] text-[#d77d9d]',
     title: 'Statystyki na urządzeniu',
     text: 'Anonimowe podsumowania dzienne: czas, uruchomienia i ukończenia. Możesz je wyeksportować lub wyzerować. Nic nie jest wysyłane.',
   },
   {
-    emoji: '🔒',
+    Icon: MoonIcon,
+    tint: 'bg-[#e3f0fb] text-[#6f9bc4]',
     title: 'Prywatność i spokój',
     text: 'Bez reklam, kont, ciasteczek i śledzenia. Bez dźwięku, punktów i porażek. Po pierwszym uruchomieniu aplikacja działa offline.',
   },
@@ -55,6 +61,16 @@ export default function ParentDialog({ onClose, onOpenSettings }: Props) {
         onClick={(event) => event.stopPropagation()}
         className="animate-rise max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-[2rem] border border-white bg-[#fbf8f2] p-6 shadow-2xl sm:rounded-[2rem] sm:p-8"
       >
+        {/* Illustrated banner */}
+        <div className="relative mb-5 h-28 overflow-hidden rounded-[1.4rem] border-2 border-white shadow-sm sm:h-32">
+          <img src={ARTWORK.hero} alt="" className="h-full w-full object-cover" />
+          <span className="absolute inset-0 bg-gradient-to-r from-white/45 via-transparent to-white/10" />
+          <span className="absolute top-2 right-3 grid h-12 w-12 place-items-center rounded-full border-2 border-white bg-white/90 shadow-md">
+            <MascotIcon className="h-9 w-9" />
+          </span>
+          <SparkleIcon className="absolute bottom-2 left-3 h-5 w-5 text-amber-400 drop-shadow" />
+        </div>
+
         <div className="flex items-start justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-[11px] font-extrabold tracking-wide text-violet-700 uppercase">
@@ -104,9 +120,9 @@ export default function ParentDialog({ onClose, onOpenSettings }: Props) {
         <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
           {tiles.map((tile) => (
             <div key={tile.title} className="rounded-2xl border border-[#eee6f3] bg-white/80 p-3.5">
-              <div className="flex items-center gap-2">
-                <span className="text-xl" aria-hidden="true">
-                  {tile.emoji}
+              <div className="flex items-center gap-2.5">
+                <span className={'grid h-9 w-9 shrink-0 place-items-center rounded-xl ' + tile.tint}>
+                  <tile.Icon className="h-6 w-6" />
                 </span>
                 <h3 className="font-display text-sm font-semibold text-[#4c4263]">{tile.title}</h3>
               </div>

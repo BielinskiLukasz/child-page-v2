@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getNativeActivity } from '../activities';
 import { Analytics } from '../utils/analytics';
 import {
@@ -12,7 +12,7 @@ import {
 interface Props {
   activityId: string;
   title: string;
-  origin?: { x: number; y: number } | null;
+  emoji?: string;
   onClose: () => void;
 }
 
@@ -76,12 +76,27 @@ function SleepingMoonScreen() {
   );
 }
 
-export default function Player({ activityId, title, origin, onClose }: Props) {
+export default function Player({ activityId, title, emoji = '🧸', onClose }: Props) {
   const NativeActivity = getNativeActivity(activityId);
   const backRef = useRef<HTMLButtonElement>(null);
 
   const [playState, setPlayState] = useState(() => loadPlaytime());
   const [expired, setExpired] = useState(() => isPlaytimeExpired());
+  const [titleVisible, setTitleVisible] = useState(true);
+  const [sceneKey, setSceneKey] = useState(0);
+
+  const restartScene = () => {
+    Analytics.track('activity_restart');
+    setSceneKey((key) => key + 1);
+    setTitleVisible(true);
+    window.setTimeout(() => setTitleVisible(false), 2600);
+  };
+
+  useEffect(() => {
+    setTitleVisible(true);
+    const timer = window.setTimeout(() => setTitleVisible(false), 3200);
+    return () => window.clearTimeout(timer);
+  }, [activityId]);
 
   useEffect(() => {
     const initial = loadPlaytime();
@@ -144,15 +159,16 @@ export default function Player({ activityId, title, origin, onClose }: Props) {
 
   return (
     <section
-      className="player-reveal fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
-      style={
-        {
-          '--ox': origin ? `${origin.x}px` : '50%',
-          '--oy': origin ? `${origin.y}px` : '50%',
-        } as CSSProperties
-      }
+      className="scene-frame fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#f3eefb]"
       aria-label={title}
     >
+      {!expired && (
+        <div className={`scene-title-pill${titleVisible ? '' : ' fade-away'}`} aria-hidden="true">
+          <span className="scene-emoji">{emoji}</span>
+          <span className="truncate">{title}</span>
+        </div>
+      )}
+
       <button
         ref={backRef}
         type="button"
@@ -176,16 +192,50 @@ export default function Player({ activityId, title, origin, onClose }: Props) {
         <HourglassIndicator progress={progress} offsetLeft={activityId === 'naklejki'} />
       )}
 
+      {!expired && (
+        <button
+          type="button"
+          onClick={restartScene}
+          className="scene-restart"
+          style={{
+            right: `calc(var(--safe-r) + ${
+              activityId === 'naklejki' ? (!unlimited ? 138 : 10) : !unlimited ? 74 : 10
+            }px)`,
+          }}
+          aria-label="Nowa scena – wylosuj od nowa"
+          title="Nowa scena"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      )}
+
       {expired ? (
         <SleepingMoonScreen />
       ) : (
         <div
-          className="h-full w-full"
+          className="animate-scene-in h-full w-full origin-center"
           style={{ opacity: stageOpacity }}
           onPointerDownCapture={() => Analytics.recordStageTouch()}
           onKeyDownCapture={() => Analytics.recordStageTouch()}
         >
-          {NativeActivity ? <NativeActivity key={activityId} /> : null}
+          {NativeActivity ? <NativeActivity key={`${activityId}-${sceneKey}`} /> : null}
         </div>
       )}
     </section>

@@ -1,0 +1,175 @@
+/* Shared palette tokens for all 68 activity SVG scenes.
+   Inline SVG presentation attributes are re-mapped to CSS variables, so one
+   place controls the whole picture-book palette (and the time-of-day mood). */
+
+:root {
+  --pal-ink: #5b5675;
+  --pal-pink: #f7a8c9;
+  --pal-butter: #ffd98a;
+  --pal-sky: #a8d8f0;
+  --pal-lilac: #c9b8f2;
+  --pal-cream: #ffe9a8;
+  --pal-sun: #ffe08a;
+  --pal-violet: #8f7fd1;
+  --pal-wood: #8d6847;
+  --pal-ink-soft: #4a4560;
+  --pal-ink-deep: #3d3a4f;
+  --pal-slate: #8a84a8;
+  --pal-coral: #ee6a5f;
+  --pal-peach: #f4a261;
+  --pal-red: #e8605a;
+  --pal-sky-soft: #dff1fb;
+  --pal-mint: #bfe6b4;
+  --pal-cream-soft: #fff3c4;
+  --pal-leaf: #a9d98f;
+  --pal-slate-dark: #6b6585;
+  --pal-sky-light: #cfeaf7;
+  --pal-teal: #9ed8c6;
+  --pal-blush: #ffb7a5;
+  --pal-grass: #8fcf9f;
+  --pal-mauve: #c9a0c0;
+  --pal-pink-soft: #f7c8dc;
+  --pal-paper: #fdfbff;
+  --pal-paper-2: #fbf7ff;
+  --pal-sand: #c99b72;
+  --pal-apricot: #ffc9a0;
+}
+
+[data-mood='poranek'] {
+  --pal-ink: #5d5675;
+  --pal-pink: #f9b7d1;
+  --pal-butter: #ffe3a1;
+  --pal-sky: #b6e2f6;
+  --pal-lilac: #d4c6f7;
+  --pal-cream: #fff0bd;
+  --pal-sun: #ffeaa5;
+  --pal-violet: #9a8ddd;
+  --pal-wood: #98724f;
+  --pal-ink-soft: #504a67;
+  --pal-ink-deep: #423e56;
+  --pal-slate: #938db2;
+  --pal-coral: #f37a6c;
+  --pal-peach: #f7ad72;
+  --pal-red: #ef716a;
+  --pal-sky-soft: #e8f6ff;
+  --pal-mint: #cceec1;
+  --pal-cream-soft: #fff7d3;
+  --pal-leaf: #b6e39c;
+  --pal-slate-dark: #726b8f;
+  --pal-sky-light: #dcf1fb;
+  --pal-teal: #abe2d0;
+  --pal-blush: #ffc3b4;
+  --pal-grass: #9cd9ac;
+  --pal-mauve: #d3adc9;
+  --pal-pink-soft: #fbd3e4;
+  --pal-paper: #fffdf6;
+  --pal-paper-2: #fffaf0;
+  --pal-sand: #d5a880;
+  --pal-apricot: #ffd4b1;
+}
+
+[data-mood='wieczor'] {
+  --pal-ink: #4c4769;
+  --pal-pink: #e3a2c2;
+  --pal-butter: #e9c68d;
+  --pal-sky: #93b9d9;
+  --pal-lilac: #b2a4dd;
+  --pal-cream: #ecd9a3;
+  --pal-sun: #e8cb8e;
+  --pal-violet: #7b6cba;
+  --pal-wood: #756047;
+  --pal-ink-soft: #3f3b57;
+  --pal-ink-deep: #35334a;
+  --pal-slate: #76719a;
+  --pal-coral: #d4665f;
+  --pal-peach: #dc9363;
+  --pal-red: #cd5f5c;
+  --pal-sky-soft: #c6d9e9;
+  --pal-mint: #a9cba6;
+  --pal-cream-soft: #ecdfb4;
+  --pal-leaf: #96bf86;
+  --pal-slate-dark: #5c5878;
+  --pal-sky-light: #b6d0e2;
+  --pal-teal: #8dbfb1;
+  --pal-blush: #e6ab9f;
+  --pal-grass: #82b591;
+  --pal-mauve: #b394ad;
+  --pal-pink-soft: #e3bacb;
+  --pal-paper: #eeeaf6;
+  --pal-paper-2: #ece8f4;
+  --pal-sand: #b18b6d;
+  --pal-apricot: #e6b89a;
+}
+
+/* Attribute selectors match the SVG markup produced by the activity modules. */
+.act-stage [fill="#5b5675"] { fill: var(--pal-ink); }
+.act-stage [stroke="#5b5675"] { stroke: var(--pal-ink); }
+.act-stage [fill="#f7a8c9"] { fill: var(--pal-pink); }
+.act-stage [stroke="#f7a8c9"] { stroke: var(--pal-pink); }
+.act-stage [fill="#ffd98a"] { fill: var(--pal-butter); }
+.act-stage [stroke="#ffd98a"] { stroke: var(--pal-butter); }
+.act-stage [fill="#a8d8f0"] { fill: var(--pal-sky); }
+.act-stage [stroke="#a8d8f0"] { stroke: var(--pal-sky); }
+.act-stage [fill="#c9b8f2"] { fill: var(--pal-lilac); }
+.act-stage [stroke="#c9b8f2"] { stroke: var(--pal-lilac); }
+.act-stage [fill="#ffe9a8"] { fill: var(--pal-cream); }
+.act-stage [stroke="#ffe9a8"] { stroke: var(--pal-cream); }
+.act-stage [fill="#ffe08a"] { fill: var(--pal-sun); }
+.act-stage [stroke="#ffe08a"] { stroke: var(--pal-sun); }
+.act-stage [fill="#8f7fd1"] { fill: var(--pal-violet); }
+.act-stage [stroke="#8f7fd1"] { stroke: var(--pal-violet); }
+.act-stage [fill="#8d6847"] { fill: var(--pal-wood); }
+.act-stage [stroke="#8d6847"] { stroke: var(--pal-wood); }
+.act-stage [fill="#4a4560"] { fill: var(--pal-ink-soft); }
+.act-stage [stroke="#4a4560"] { stroke: var(--pal-ink-soft); }
+.act-stage [fill="#3d3a4f"] { fill: var(--pal-ink-deep); }
+.act-stage [stroke="#3d3a4f"] { stroke: var(--pal-ink-deep); }
+.act-stage [fill="#8a84a8"] { fill: var(--pal-slate); }
+.act-stage [stroke="#8a84a8"] { stroke: var(--pal-slate); }
+.act-stage [fill="#ee6a5f"] { fill: var(--pal-coral); }
+.act-stage [stroke="#ee6a5f"] { stroke: var(--pal-coral); }
+.act-stage [fill="#f4a261"] { fill: var(--pal-peach); }
+.act-stage [stroke="#f4a261"] { stroke: var(--pal-peach); }
+.act-stage [fill="#e8605a"] { fill: var(--pal-red); }
+.act-stage [stroke="#e8605a"] { stroke: var(--pal-red); }
+.act-stage [fill="#dff1fb"] { fill: var(--pal-sky-soft); }
+.act-stage [stroke="#dff1fb"] { stroke: var(--pal-sky-soft); }
+.act-stage [fill="#bfe6b4"] { fill: var(--pal-mint); }
+.act-stage [stroke="#bfe6b4"] { stroke: var(--pal-mint); }
+.act-stage [fill="#fff3c4"] { fill: var(--pal-cream-soft); }
+.act-stage [stroke="#fff3c4"] { stroke: var(--pal-cream-soft); }
+.act-stage [fill="#a9d98f"] { fill: var(--pal-leaf); }
+.act-stage [stroke="#a9d98f"] { stroke: var(--pal-leaf); }
+.act-stage [fill="#6b6585"] { fill: var(--pal-slate-dark); }
+.act-stage [stroke="#6b6585"] { stroke: var(--pal-slate-dark); }
+.act-stage [fill="#cfeaf7"] { fill: var(--pal-sky-light); }
+.act-stage [stroke="#cfeaf7"] { stroke: var(--pal-sky-light); }
+.act-stage [fill="#9ed8c6"] { fill: var(--pal-teal); }
+.act-stage [stroke="#9ed8c6"] { stroke: var(--pal-teal); }
+.act-stage [fill="#ffb7a5"] { fill: var(--pal-blush); }
+.act-stage [stroke="#ffb7a5"] { stroke: var(--pal-blush); }
+.act-stage [fill="#8fcf9f"] { fill: var(--pal-grass); }
+.act-stage [stroke="#8fcf9f"] { stroke: var(--pal-grass); }
+.act-stage [fill="#c9a0c0"] { fill: var(--pal-mauve); }
+.act-stage [stroke="#c9a0c0"] { stroke: var(--pal-mauve); }
+.act-stage [fill="#f7c8dc"] { fill: var(--pal-pink-soft); }
+.act-stage [stroke="#f7c8dc"] { stroke: var(--pal-pink-soft); }
+.act-stage [fill="#fdfbff"] { fill: var(--pal-paper); }
+.act-stage [stroke="#fdfbff"] { stroke: var(--pal-paper); }
+.act-stage [fill="#fbf7ff"] { fill: var(--pal-paper-2); }
+.act-stage [stroke="#fbf7ff"] { stroke: var(--pal-paper-2); }
+.act-stage [fill="#c99b72"] { fill: var(--pal-sand); }
+.act-stage [stroke="#c99b72"] { stroke: var(--pal-sand); }
+.act-stage [fill="#ffc9a0"] { fill: var(--pal-apricot); }
+.act-stage [stroke="#ffc9a0"] { stroke: var(--pal-apricot); }
+
+/* Also cover the CSS-side palette declarations in the activity stylesheet. */
+.act-stage .g-orb,
+.act-stage .tp-sun,
+.act-stage .sa-sun,
+.act-stage .tk-sun,
+.act-stage .ab-sun,
+.act-stage .ld-sun,
+.act-stage .r-scene::before {
+  transition: background-color 0.6s ease, box-shadow 0.6s ease;
+}
