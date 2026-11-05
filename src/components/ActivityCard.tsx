@@ -1,5 +1,6 @@
 import type { Activity } from '../data/activities';
 import { CATEGORY_STYLES } from '../data/activities';
+import ActivityIcon from './ActivityIcon';
 
 interface Props {
   activity: Activity;
@@ -43,12 +44,11 @@ export default function ActivityCard({
       />
 
       <div className="pointer-events-none relative z-10 flex items-start justify-between gap-1.5">
-        <span
-          className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl text-[1.8rem] shadow-inner ${style.tile}`}
-          aria-hidden="true"
-        >
-          {activity.emoji}
-        </span>
+        <ActivityIcon
+          id={activity.id}
+          fallback={activity.emoji}
+          className="card-icon h-[4.25rem] w-[4.25rem] sm:h-[4.75rem] sm:w-[4.75rem]"
+        />
         <span
           className={`mr-7 hidden rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide sm:inline-block ${style.pill}`}
         >

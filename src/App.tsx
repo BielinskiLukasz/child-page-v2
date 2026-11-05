@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NATIVE_COUNT } from './activities';
 import ActivityCard from './components/ActivityCard';
+import ActivityIcon from './components/ActivityIcon';
 import ParentDialog from './components/ParentDialog';
 import ParentSettingsModal from './components/ParentSettingsModal';
 import Player from './components/Player';
@@ -361,7 +362,7 @@ export default function App() {
               }}
               className="animate-float absolute top-[19%] left-0 z-20 w-[168px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-violet-200/40 transition hover:scale-[1.03] [--tilt:-5deg]"
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#e6f4e4] text-2xl" aria-hidden="true">🐠</span>
+              <ActivityIcon id="akwarium" className="h-14 w-14" />
               <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Akwarium Artura</span>
               <span className="mt-0.5 block text-[10.5px] font-bold text-[#70a06a]">przyroda</span>
             </button>
@@ -375,7 +376,7 @@ export default function App() {
               className="animate-float absolute top-[4%] right-0 z-20 w-[152px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-fuchsia-200/40 transition hover:scale-[1.03] [--tilt:5deg]"
               style={{ animationDelay: '0.8s' }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#e3f0fb] text-2xl" aria-hidden="true">🚀</span>
+              <ActivityIcon id="rakieta" className="h-14 w-14" />
               <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Rakieta</span>
               <span className="mt-0.5 block text-[10.5px] font-bold text-[#5f8fb5]">pojazdy</span>
             </button>
@@ -402,7 +403,7 @@ export default function App() {
               className="animate-float absolute bottom-[4%] left-[5%] z-20 w-[152px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-amber-200/40 transition hover:scale-[1.03] [--tilt:3deg]"
               style={{ animationDelay: '2s' }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#fde8ee] text-2xl" aria-hidden="true">🧸</span>
+              <ActivityIcon id="ubierz-misia" className="h-14 w-14" />
               <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Ubierz Misia</span>
               <span className="mt-0.5 block text-[10.5px] font-bold text-[#c06f8c]">zwierzątka</span>
             </button>
@@ -416,7 +417,7 @@ export default function App() {
               className="animate-float absolute right-[3%] bottom-0 z-20 w-[164px] cursor-pointer rounded-2xl border border-white bg-white/95 p-3 text-left shadow-xl shadow-rose-200/40 transition hover:scale-[1.03] [--tilt:-3deg]"
               style={{ animationDelay: '1.2s' }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#fdf0da] text-2xl" aria-hidden="true">🍕</span>
+              <ActivityIcon id="pizza" className="h-14 w-14" />
               <span className="font-display mt-2 block text-[13px] font-semibold text-[#4d4264]">Pizza</span>
               <span className="mt-0.5 block text-[10.5px] font-bold text-[#a87a3f]">kreatywne</span>
             </button>
