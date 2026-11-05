@@ -1,0 +1,399 @@
+/* Illustrated art direction for Ogród Motyli. Flight, sway, idle timing and the decorative particles are driven from
+   MotyleActivity.tsx; this file only styles them. */
+
+/* ── Sky ────────────────────────────────────────────────────────────── */
+.act-stage .m-scene {
+  background:
+    radial-gradient(ellipse 55% 40% at 88% 4%, rgba(255, 244, 196, 0.72), transparent 70%),
+    linear-gradient(180deg, #96cdee 0%, #bfe2f5 26%, #e2f2f3 46%, #fbf1dc 66%, #f6eed7 100%);
+}
+
+.m-scene .m-sky-decor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The sun sits below the playtime hourglass in the top-right corner. */
+.m-sky-decor .m-sun {
+  position: absolute;
+  top: calc(var(--safe-t) + 74px);
+  right: calc(var(--safe-r) + 7%);
+  width: clamp(56px, 12vmin, 118px);
+  aspect-ratio: 1;
+}
+
+.m-sun .m-sun-disc {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.m-sun .m-sun-spin {
+  position: absolute;
+  inset: -22%;
+  animation: m-spin 110s linear infinite;
+}
+
+.m-sun .m-sun-spin svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.m-sun .m-ray {
+  fill: none;
+  stroke: #ffd76e;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.m-sun .m-ray-short {
+  stroke: #ffe6a0;
+  stroke-width: 4;
+}
+
+@keyframes m-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Clouds drift with a transform; under reduced motion they stay at their --x0 position. */
+.m-sky-decor .m-cloud {
+  position: absolute;
+  left: 0;
+  display: block;
+  opacity: 0.95;
+  transform: translateX(var(--x0, 10vw));
+  animation: m-cloud var(--dur, 170s) linear var(--delay, 0s) infinite;
+}
+
+.m-cloud svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.m-cloud .m-cloud-shadow { fill: #b6cfe1; opacity: 0.42; }
+.m-cloud .m-cloud-body { fill: #ffffff; }
+.m-cloud .m-cloud-under { fill: #a9c4d8; opacity: 0.26; }
+
+@keyframes m-cloud {
+  from { transform: translateX(-32vw); }
+  to { transform: translateX(112vw); }
+}
+
+/* Dandelion seeds floating across the sky. */
+.m-sky-decor .m-seed {
+  position: absolute;
+  left: -4%;
+  display: block;
+  aspect-ratio: 1;
+  opacity: 0;
+  animation: m-seed var(--dur, 24s) linear var(--delay, 0s) infinite;
+}
+
+.m-seed svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.m-seed .m-seed-stalk,
+.m-seed .m-seed-fluff path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-linecap: round;
+}
+
+.m-seed .m-seed-stalk { stroke-width: 1.2; stroke: #f4efe2; }
+.m-seed .m-seed-fluff path { stroke-width: 0.9; opacity: 0.9; }
+.m-seed .m-seed-core { fill: #e8dcc0; }
+
+@keyframes m-seed {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.85; }
+  50% { transform: translate(54vw, -4vh) rotate(170deg); }
+  88% { opacity: 0.7; }
+  100% { transform: translate(112vw, 2vh) rotate(340deg); opacity: 0; }
+}
+
+/* ── Meadow, anchored to the play square ────────────────────────────── */
+.m-box .m-land {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The meadow starts at the horizon (36% of the square) and extends to the screen edges and bottom. */
+.m-land .m-meadow {
+  position: absolute;
+  top: 36%;
+  right: -100vw;
+  bottom: 0;
+  left: -100vw;
+  background: linear-gradient(180deg, #bfe3a5 0%, #b2dd9a 14%, #a1d58b 46%, #92cb7d 100%);
+}
+
+.m-land .m-meadow::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 100vh;
+  background: #92cb7d;
+}
+
+/* Replaced elements need an explicit size when absolutely positioned. */
+.m-land .m-hills {
+  position: absolute;
+  bottom: 64%;
+  left: -150%;
+  display: block;
+  width: 400%;
+  height: 20%;
+  overflow: visible;
+}
+
+.m-hills .m-hill-far { fill: #b5d9c4; }
+.m-hills .m-hill-near { fill: #bfe3a5; }
+
+.m-hills .m-hill-rim {
+  fill: none;
+  stroke: rgba(242, 251, 236, 0.85);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.m-hills .m-hill-rim-near {
+  stroke: rgba(236, 250, 214, 0.9);
+}
+
+.m-hills .m-far-trees rect { fill: #8fab9b; }
+.m-hills .m-far-trees circle { fill: #9cc9ae; }
+.m-hills .m-far-trees .m-tree-shade { fill: #8bbb9f; }
+
+.m-land .m-meadow-art {
+  position: absolute;
+  top: 36%;
+  left: -60%;
+  display: block;
+  width: 220%;
+  height: 74%;
+  overflow: visible;
+}
+
+.m-meadow-art .m-specks { opacity: 0.8; }
+
+.m-meadow-art .m-meadow-tuft {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.m-meadow-art .m-pebbles ellipse { fill: #d9cfb8; }
+.m-meadow-art .m-pebbles .m-pebble-shine { fill: #f4efe2; }
+
+.m-meadow-art .m-clover path { fill: #7ec27a; }
+
+.m-meadow-art .m-clover .m-clover-stem {
+  fill: none;
+  stroke: #6aa865;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+/* ── Flowers ────────────────────────────────────────────────────────── */
+/* The SVG is positioned so it paints above the host halo that sits behind it. */
+.m-box .m-flower svg {
+  position: relative;
+}
+
+.m-flower .m-halo {
+  position: absolute;
+  inset: -25%;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 205, 0.95) 0%,
+    rgba(255, 234, 150, 0.42) 36%,
+    rgba(255, 234, 150, 0) 68%
+  );
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+
+.m-flower.host .m-halo {
+  opacity: 1;
+  transform: scale(1);
+  animation: m-halo 3.4s ease-in-out 0.6s infinite;
+}
+
+@keyframes m-halo {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* The base tuft and ground shadow do not take input, so the touchable area stays the button, stem and leaves. */
+.m-flower .m-ground-shadow {
+  fill: rgba(56, 84, 50, 0.2);
+  pointer-events: none;
+}
+
+.m-flower .m-tuft {
+  fill: none;
+  stroke: #6fb26e;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.m-flower .m-stem {
+  fill: none;
+  stroke: #6fb37f;
+  stroke-width: 6.5;
+  stroke-linecap: round;
+}
+
+.m-flower .m-stem-shine {
+  fill: none;
+  stroke: #c4ebbb;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.m-flower .m-leaf-vein {
+  fill: none;
+  stroke: #5e9f6f;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.m-flower .m-petal-shadow {
+  fill: #3e5a3a;
+  opacity: 0.16;
+}
+
+.m-flower .m-petal-vein path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-opacity: 0.5;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+
+/* ── Butterfly, its shadow and the pollen particles ─────────────────── */
+/* Drawn outlines replace the original CSS drop-shadow, so the flapping wings are not re-filtered every frame. */
+.m-box .m-butterfly svg {
+  filter: none;
+}
+
+.m-butterfly .m-wing-edge {
+  fill: none;
+  stroke: #4a4560;
+  stroke-opacity: 0.45;
+  stroke-width: 4.6;
+  stroke-linejoin: round;
+}
+
+.m-butterfly .m-wing-fill {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.m-butterfly .m-wing-vein {
+  fill: none;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  opacity: 0.38;
+}
+
+.m-butterfly .m-wing-shine {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.m-butterfly .m-antennae {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: m-antennae 3.2s ease-in-out infinite;
+}
+
+.m-butterfly .m-antennae path {
+  fill: none;
+  stroke: #5b5675;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.m-butterfly .m-antennae circle {
+  fill: #5b5675;
+}
+
+@keyframes m-antennae {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+.m-box .m-bshadow {
+  position: absolute;
+  z-index: 1;
+  width: 13%;
+  min-width: 48px;
+  aspect-ratio: 5 / 4;
+  background: radial-gradient(ellipse 44% 28% at 50% 50%, rgba(50, 68, 46, 0.5), rgba(50, 68, 46, 0) 72%);
+  pointer-events: none;
+}
+
+.m-box .m-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* ── Foreground grass along the bottom of the screen ────────────────── */
+.m-scene .m-front {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: clamp(36px, 9vh, 96px);
+  pointer-events: none;
+}
+
+.m-front .m-front-back { fill: #86c278; }
+.m-front .m-front-front { fill: #6fb168; }
+
+/* ── Hidden tab and reduced motion ──────────────────────────────────── */
+.m-scene.paused,
+.m-scene.paused * {
+  animation-play-state: paused !important;
+}
+
+/* The global rule already stops CSS animations and transitions (clouds, sun rays, antennae and halo become static);
+   the pollen particles are not created at all, and the seeds only make sense while moving. */
+@media (prefers-reduced-motion: reduce) {
+  .m-sky-decor .m-seed {
+    display: none;
+  }
+}

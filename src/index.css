@@ -3,6 +3,7 @@
 @import "./activities/ogrod.css";
 @import "./activities/niebo.css";
 @import "./activities/dzien-i-noc.css";
+@import "./activities/motyle.css";
 
 @theme {
   --font-display: "Fredoka", ui-rounded, system-ui, sans-serif;
